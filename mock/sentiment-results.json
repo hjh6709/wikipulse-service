@@ -3,21 +3,21 @@
     "issue_id": "issue-1",
     "comment_id": "comment-001",
     "sentiment": "positive",
-    "score": 0.92,
+    "sentiment_score": 0.92,
     "timestamp": "2026-04-20T00:00:00Z"
   },
   {
     "issue_id": "issue-1",
     "comment_id": "comment-002",
     "sentiment": "negative",
-    "score": 0.75,
+    "sentiment_score": 0.75,
     "timestamp": "2026-04-20T00:01:00Z"
   },
   {
     "issue_id": "issue-1",
     "comment_id": "comment-003",
     "sentiment": "neutral",
-    "score": 0.60,
+    "sentiment_score": 0.60,
     "timestamp": "2026-04-20T00:02:00Z"
   }
 ]

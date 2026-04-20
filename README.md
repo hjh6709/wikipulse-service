@@ -1,6 +1,17 @@
-# WikiPulse — Real-time Wikipedia Edit Spike Dashboard
+# WikiPulse — Real-time Issue Detection Platform
 
-Wikipedia 편집 폭증 이벤트를 실시간으로 감지하고 대시보드로 시각화하는 모니터링 시스템입니다.
+뉴스 기사가 나오기 전에 이슈를 포착합니다.
+
+Wikipedia 편집이 폭증하는 순간, 해당 키워드로 Reddit 여론을 자동 수집하고 AI가 "지금 무슨 일이 벌어지고 있는가"를 한 문장으로 요약합니다.
+
+## Why WikiPulse?
+
+| | 기존 뉴스/트렌드 서비스 | WikiPulse |
+|---|---|---|
+| 이슈 감지 시점 | 기사 보도 후 | 편집 폭증 감지 즉시 |
+| 여론 데이터 | 없음 | Reddit 감성 분석 자동 수집 |
+| 해석 | 기자가 작성 | AI가 실시간 브리핑 생성 |
+| 대상 | 일반 독자 | 언론사, 홍보, 리서치 애널리스트 |
 
 ## Tech Stack
 

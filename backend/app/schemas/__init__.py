@@ -15,7 +15,7 @@ class SentimentResult(BaseModel):
     issue_id: str
     comment_id: str
     sentiment: Literal["positive", "negative", "neutral"]
-    score: float
+    sentiment_score: float
     timestamp: datetime
 
 
