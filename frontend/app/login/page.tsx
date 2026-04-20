@@ -1,8 +1,20 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useState } from "react";
 
 export default function LoginPage() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleMockLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    await signIn("credentials", { username, password, callbackUrl: "/issues" });
+    setLoading(false);
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
       <div className="w-full max-w-sm rounded-2xl border border-gray-800 bg-gray-900 p-8 shadow-xl">
@@ -11,16 +23,38 @@ export default function LoginPage() {
           <p className="mt-1 text-sm text-gray-400">계정으로 로그인하세요</p>
         </div>
 
-        <button
-          onClick={() => signIn("keycloak", { callbackUrl: "/issues" })}
-          className="w-full rounded-lg bg-blue-600 py-3 font-semibold hover:bg-blue-500 transition-colors"
-        >
-          Keycloak으로 로그인
-        </button>
+        <form onSubmit={handleMockLogin} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full rounded-lg bg-gray-800 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-lg bg-gray-800 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600"
+          />
+          <button
+            type="submit"
+            disabled={loading || !username}
+            className="w-full rounded-lg bg-blue-600 py-3 font-semibold hover:bg-blue-500 transition-colors disabled:opacity-50"
+          >
+            {loading ? "로그인 중..." : "로그인"}
+          </button>
+        </form>
 
-        <p className="mt-4 text-center text-xs text-gray-500">
-          로컬 개발 환경에서는 Keycloak 없이 직접 진입합니다
-        </p>
+        {process.env.NEXT_PUBLIC_KEYCLOAK_ENABLED === "true" && (
+          <button
+            onClick={() => signIn("keycloak", { callbackUrl: "/issues" })}
+            className="mt-3 w-full rounded-lg border border-gray-700 py-3 text-sm hover:bg-gray-800 transition-colors"
+          >
+            Keycloak으로 로그인
+          </button>
+        )}
       </div>
     </main>
   );

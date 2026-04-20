@@ -77,26 +77,31 @@ wikipulse-service/
 
 ## 주별 목표
 
-### 1주차 — 환경 세팅 & 뼈대
-- [ ] FastAPI 프로젝트 생성 (Poetry)
-- [ ] Next.js 14 프로젝트 생성 (TypeScript, App Router)
-- [ ] Docker Compose 로컬 개발환경 (FastAPI + Next.js + Redis + Kafka)
-- [ ] OpenAPI 스키마 초안 (데이터팀과 인터페이스 합의용)
-- [ ] Keycloak OIDC 기본 연동 설정
-- [ ] 로그인 페이지 UI 와이어프레임
+### 1주차 — 환경 세팅 & 뼈대 ✅
+- [x] FastAPI 프로젝트 생성 (Poetry)
+- [x] Next.js 14 프로젝트 생성 (TypeScript, App Router)
+- [x] Docker Compose 로컬 개발환경 (FastAPI + Next.js + Redis)
+- [x] OpenAPI 스키마 초안 (/docs Swagger 자동 생성)
+- [x] Keycloak OIDC next-auth 코드 설정 (로컬 서버는 Week 2에)
+- [x] 로그인 페이지 UI 와이어프레임
 
-✅ **완료 기준**: `/health` 응답 + Next.js 로컬 실행 + 로그인 화면 렌더링
+> 비고: aioredis → redis[asyncio] 교체 (Python 3.12+ 호환 이슈), next.config.ts → next.config.mjs (Next.js 14.2 미지원)
+
+✅ **완료 기준**: `/health` 응답 ✅ + Next.js 로컬 실행 ✅ + 로그인 화면 렌더링 ✅
 
 ---
 
-### 2주차 — 로그인 + 이슈 피드 REST API
-- [ ] Keycloak OIDC 로그인 완성 (next-auth)
-- [ ] `GET /issues` 구현 (Redis 캐시 우선)
-- [ ] `GET /issues/{id}/sentiment` 구현
-- [ ] Kong Gateway 라우팅 설정
-- [ ] 트렌딩 이슈 리스트 컴포넌트
+### 2주차 — 로그인 + 이슈 피드 REST API ✅
+- [x] 로컬 mock Credentials 로그인 (Keycloak 없이 동작)
+- [x] `GET /issues` Redis 캐시 + 미연결 fallback
+- [x] 세션 토큰 → API 호출 연동
+- [x] 트렌딩 이슈 리스트 컴포넌트
+- [x] 미로그인 시 /login redirect
+- [-] Kong Gateway 라우팅 설정 → 로컬은 env var 우회 유지, 김용균 확인 후 진행
 
-✅ **완료 기준**: 로그인 → 이슈 리스트 화면 진입 가능
+> 비고: useSession status 체크 누락으로 초기 렌더에 401 발생 → status === "loading" 가드 추가
+
+✅ **완료 기준**: 로그인 → 이슈 리스트 화면 진입 가능 ✅
 
 ---
 

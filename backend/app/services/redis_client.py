@@ -20,16 +20,25 @@ async def close_redis() -> None:
 
 
 async def get_issues_cached() -> list[dict] | None:
-    redis = await get_redis()
-    cached = await redis.get("issues:list")
-    return json.loads(cached) if cached else None
+    try:
+        redis = await get_redis()
+        cached = await redis.get("issues:list")
+        return json.loads(cached) if cached else None
+    except Exception:
+        return None
 
 
 async def set_issues_cached(data: list[dict], ttl: int = 60) -> None:
-    redis = await get_redis()
-    await redis.setex("issues:list", ttl, json.dumps(data))
+    try:
+        redis = await get_redis()
+        await redis.setex("issues:list", ttl, json.dumps(data))
+    except Exception:
+        pass
 
 
 async def invalidate_issues_cache() -> None:
-    redis = await get_redis()
-    await redis.delete("issues:list")
+    try:
+        redis = await get_redis()
+        await redis.delete("issues:list")
+    except Exception:
+        pass
