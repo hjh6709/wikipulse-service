@@ -7,16 +7,19 @@
 ## 1. 전체 아키텍처 흐름
 
 ```
-브라우저 (Next.js)
-    ↓ HTTP / WebSocket
-FastAPI (백엔드)
-    ↓ 읽기          ↓ 소비
-  Redis           Kafka
- (캐시)       (AI/데이터팀 메시지)
+Wikipedia SSE → Kafka (데이터팀/AI팀)
+                    ↓
+              FastAPI (소비자)
+              ↓ 읽기/쓰기    ↓ broadcast
+            Redis          WebSocket
+           (캐시)           ↓
+                       Next.js (브라우저)
 ```
 
 브라우저가 Next.js 화면을 보여주고, 데이터가 필요하면 FastAPI에 요청합니다.
 FastAPI는 Redis에서 캐시된 데이터를 먼저 찾고, 없으면 Kafka에서 받은 데이터를 씁니다.
+
+> 시각적인 시스템 구성도 → `docs/architecture.md` (Mermaid 다이어그램)
 
 ---
 
@@ -313,11 +316,83 @@ poetry run uvicorn ...  # 가상환경 안에서 실행
 
 ---
 
-## 12. 주차별 핵심 개념 요약
+## 12. 감성 분석 (Sentiment Analysis)
+
+AI팀(양성호)이 Reddit 댓글을 DistilBERT 모델로 분석합니다.
+
+| 필드 | 설명 |
+|---|---|
+| `sentiment` | 분류 결과: `positive` / `negative` / `neutral` |
+| `sentiment_score` | 해당 sentiment일 확신도 (0~1, 1에 가까울수록 확신) |
+
+```json
+{ "sentiment": "negative", "sentiment_score": 0.91 }
+// → "이 댓글은 부정적이라고 91% 확신"
+```
+
+> `score`라고 쓰면 `spike_score`와 혼동되므로 반드시 `sentiment_score`로 구분
+
+---
+
+## 13. 이슈 생애주기
+
+Wikipedia 편집 폭증 이벤트가 감지되면 이슈가 생성되고 상태가 변합니다.
+
+```
+발생 → 확산 → 정점 → 소강 → 아카이브
+```
+
+| 상태 | 홈 노출 | 상세 접근 |
+|---|---|---|
+| 발생 / 확산 / 정점 | ✅ | ✅ |
+| 소강 | ❌ (자동 제거) | ✅ |
+| 아카이브 | ❌ | ✅ (/history) |
+
+상태 판단 주체는 아직 미확정 — 김찬영(데이터팀) 확인 필요 (`docs/decisions.md` 참고)
+
+---
+
+## 14. AWS Lambda
+
+서버 없이 코드를 실행하는 AWS 서비스입니다. 항상 켜있지 않고 이벤트가 있을 때만 실행됩니다.
+
+```
+Kafka alerts 이벤트 수신
+    ↓
+FastAPI가 Lambda 호출 (boto3)
+    ↓
+Lambda 실행 → Discord/이메일 알림 발송
+```
+
+**왜 Lambda를 쓰나?**
+알림 발송은 가끔 발생하는 작업이라 24시간 서버를 켜두는 것보다 이벤트 시에만 실행하는 게 비용 효율적입니다.
+
+---
+
+## 15. CloudFront (CDN)
+
+AWS의 CDN(Content Delivery Network) 서비스입니다. 사용자 가까운 엣지 서버에서 콘텐츠를 제공해 속도를 높입니다.
+
+```
+사용자 (한국) → CloudFront 엣지 (서울) → K8s Next.js Pod
+```
+
+**CDN이란?**
+전 세계 여러 곳에 캐시 서버를 두고, 사용자와 가장 가까운 서버에서 응답합니다. 원본 서버까지 매번 요청하지 않아도 됩니다.
+
+> Cloudflare도 CDN 서비스지만 이 프로젝트는 AWS 스택 통일로 CloudFront 사용 (`docs/decisions.md` 참고)
+
+---
+
+## 16. 주차별 핵심 개념 요약
 
 | 주차 | 핵심 개념 |
 |---|---|
-| 1주차 | FastAPI 구조, Next.js App Router, Docker Compose |
-| 2주차 | JWT 인증, next-auth, Redis 캐시, 환경변수 |
-| 3주차 | WebSocket, Kafka consume, Recharts |
-| 4주차 | AWS Lambda, E2E 흐름 |
+| 1주차 | FastAPI 구조, Next.js App Router, Docker Compose, Poetry |
+| 2주차 | JWT 인증, next-auth, Redis 캐시, 환경변수, Kong Gateway |
+| 3주차 | WebSocket, Kafka consume, Recharts 실시간 차트 |
+| 4주차 | AWS Lambda, E2E 흐름, AI 브리핑 카드 |
+| 5주차 | Kong 실제 연동, 이슈 상세 페이지, 유저 설정 API |
+| 6주차 | Keycloak SSO, Redis TTL 전략, API 응답 포맷 표준화 |
+| 7주차 | CloudFront 배포, Lambda 알림, 히스토리 검색 |
+| 8주차 | 테스트 (pytest, Jest, k6), 성능 최적화, 팀 데모 |
