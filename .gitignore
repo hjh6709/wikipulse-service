@@ -1,0 +1,25 @@
+# env
+.env
+.env.local
+.env.production
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+dist/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+out/
+
+# Docker
+.dockerignore
+
+# IDE
+.idea/
+.vscode/
+*.swp
