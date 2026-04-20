@@ -7,19 +7,37 @@
 # Python
 __pycache__/
 *.pyc
+*.pyo
 .venv/
 dist/
 *.egg-info/
+.pytest_cache/
 
 # Node
 node_modules/
 .next/
 out/
+npm-debug.log*
 
-# Docker
-.dockerignore
+# macOS
+.DS_Store
 
 # IDE
 .idea/
 .vscode/
 *.swp
+
+# Test coverage
+.coverage
+htmlcov/
+coverage.xml
+
+# Logs
+*.log
+
+# Secrets
+*.pem
+*.key
+
+# Claude Code
+.claude/

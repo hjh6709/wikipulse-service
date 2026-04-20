@@ -1,87 +1,86 @@
-# wikipulse-service
+# WikiPulse — Real-time Wikipedia Edit Spike Dashboard
 
-🚀 AI-Driven Real-time Issue Monitoring System
+Wikipedia 편집 폭증 이벤트를 실시간으로 감지하고 대시보드로 시각화하는 모니터링 시스템입니다.
 
-이 프로젝트는 FastAPI와 Next.js 14를 기반으로 한 실시간 이슈 모니터링 및 알림 시스템입니다. 1주차에는 프로젝트의 핵심 아키텍처 설계와 Mock 데이터를 활용한 전체 파이프라인 검증(PoC)을 완료했습니다.
-🛠 Tech Stack
-분류 기술 스택
-Frontend Next.js 14 (App Router), TypeScript, Tailwind CSS
-Backend FastAPI, Poetry, Pydantic v2, Python-jose
-Real-time WebSocket, Redis, AIoKafka
-Auth Next-Auth, Keycloak (Ready)
-DevOps Docker, Docker Compose
-📂 Project Structure
-🔹 Backend (/backend)
+## Tech Stack
 
-    app/main.py: FastAPI 앱 설정, CORS 및 헬스체크(/health) 엔드포인트.
+| 분류 | 기술 |
+|---|---|
+| Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS, Recharts |
+| Backend | FastAPI, Python 3.11, Poetry, Pydantic v2 |
+| Auth | next-auth, Keycloak OIDC |
+| Real-time | WebSocket, Kafka (aiokafka) |
+| Cache | Redis (redis[asyncio]) |
+| Infra | Docker, Docker Compose, Kong Gateway, AWS Lambda |
 
-    app/core/: config.py(Pydantic-settings) 및 auth.py(JWT/JWKS 로직).
+## Architecture
 
-    app/api/: 기능별 라우터(Issues, Alerts, WebSocket).
+```
+Browser (Next.js)
+    ↓ HTTP / WebSocket
+FastAPI
+    ↓ cache          ↓ consume
+  Redis            Kafka
+                (AI/Data team)
+```
 
-    app/services/: Redis, Kafka Consumer, 외부 서비스 연동 로직.
+## API
 
-    app/schemas/: 데이터 유효성 검사를 위한 Pydantic 모델.
+```
+GET  /issues
+GET  /issues/{id}/briefing
+GET  /issues/{id}/sentiment
+GET  /issues/{id}/timeline
+POST /alerts/settings
+WS   /ws/issues
+```
 
-🔹 Frontend (/frontend)
+## Getting Started
 
-    app/login/: Keycloak 연동 로그인 페이지.
+### 환경변수 설정
 
-    app/issues/: 이슈 리스트 및 상세 대시보드.
-
-    hooks/useWebSocket.ts: 3초 자동 재연결 기능이 포함된 실시간 통신 훅.
-
-    lib/api.ts: 타입 안정성이 보장된 fetch wrapper.
-
-⚙️ Key Features (Week 1)
-
-    Mock Mode Support: USE_MOCK=true 설정을 통해 Kafka나 Keycloak 없이도 전체 기능 테스트 가능.
-
-    Real-time Streaming: WebSocket을 통한 실시간 알림 및 데이터 업데이트.
-
-    Scalable Architecture: 2주차 Keycloak 및 실전 인프라 전환을 고려한 인터페이스 분리.
-
-    Containerization: Docker Compose를 통한 원클릭 개발 환경 구축.
-
-🚀 Getting Started
-
-1. Environment Setup
-
-각 디렉토리에 환경 변수 파일을 생성합니다.
-Bash
-
+```bash
 cp backend/.env.example backend/.env.local
 cp frontend/.env.example frontend/.env.local
+```
 
-2. Running with Docker (Recommended)
-   Bash
+### Docker로 실행 (권장)
 
+```bash
 docker compose up --build
+```
 
-3. Local Development
+### 로컬 직접 실행
 
-Backend:
-Bash
-
+**Backend**
+```bash
 cd backend
 poetry install
-uvicorn app.main:app --reload
+poetry run uvicorn app.main:app --reload
+# http://localhost:8000/health
+# http://localhost:8000/docs
+```
 
-# Access at: http://localhost:8000/health
-
-Frontend:
-Bash
-
+**Frontend**
+```bash
 cd frontend
 npm install
 npm run dev
+# http://localhost:3000
+```
 
-# Access at: http://localhost:3000/login
+로그인 화면에서 아무 username/password 입력하면 로컬 mock 로그인이 됩니다.
 
-📅 Roadmap
+## Features
 
-    [x] Week 1: 아키텍처 설계, Mock 기반 데이터 스트리밍, UI 뼈대 구축.
+- **Mock Mode** — `USE_MOCK=true` 설정으로 Kafka/Keycloak 없이 전체 기능 로컬 테스트 가능
+- **Redis Cache** — 이슈 목록 60초 캐시, Redis 미연결 시 자동 fallback
+- **JWT Auth** — next-auth 기반 인증, 미로그인 시 `/login` 자동 redirect
+- **WebSocket** — 실시간 감성 분석/브리핑/스파이크 이벤트 스트리밍 (Week 3)
 
-    [ ] Week 2: Keycloak을 활용한 인증 서버 통합 및 실제 Kafka 토픽 연동.
+## Roadmap
 
-    [ ] Week 3: AI 모델 연동 및 데이터 분석 결과 시각화 고도화.
+- [x] Week 1 — FastAPI + Next.js 14 프로젝트 scaffold, Docker Compose, OpenAPI 스키마
+- [x] Week 2 — 로그인 플로우, 이슈 리스트, Redis 캐시, 세션 토큰 연동
+- [ ] Week 3 — WebSocket 서버, Kafka consume, 실시간 차트 (Recharts)
+- [ ] Week 4 — AI 브리핑 카드, 알림 설정, Lambda 연동, E2E 테스트
