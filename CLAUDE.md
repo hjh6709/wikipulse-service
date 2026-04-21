@@ -13,6 +13,7 @@ Consume Kafka output from data/AI team → serve to browser
 ```
 GET    /issues
 GET    /issues/archived
+GET    /issues/{id}
 GET    /issues/{id}/briefing
 GET    /issues/{id}/sentiment
 GET    /issues/{id}/timeline
@@ -43,6 +44,14 @@ WS     /ws/issues
 - [ ] alerts 토픽 status 필드 확인 (김찬영) → WebSocket 실시간 status 업데이트 구현
 - [ ] Kafka real schema integration (mock → 실데이터, 김찬영·양성호 확정 후)
 
+## UI / Design
+- Theme: stone palette (warm dark) + amber accent + sky for "발생" status
+- Font: Playfair Display (serif) via next/font — applied to WikiPulse logo + page h1 headings
+- Page names: "Trend" (이슈 피드), "Archive" (이슈 히스토리)
+- Issue cards: colored left border by status, relative time display
+- Archive page: month grouping + period filter (3m/6m/1y) + sort (latest/edits) + per-group 더보기
+- Light/dark theme toggle deferred — implement after real data integration
+
 ## Notes
 - Kafka schema TBD → use mock/ JSON
 - No Kong/Keycloak locally → direct call + JWT mock
@@ -50,4 +59,5 @@ WS     /ws/issues
 - next.config.ts → next.config.mjs (not supported in Next.js 14.2)
 - WS invalid token → close(1008) (not HTTPException raise)
 - alerts 토픽 status 필드 → 김찬영 확인 후 WebSocket spike 메시지에 status 포함 예정
+- WS 403 = expired token (8h TTL) → re-login required
 - Sprint detail → docs/sprint.md

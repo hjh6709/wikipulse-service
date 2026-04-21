@@ -202,13 +202,21 @@ wikipulse-service/
 
 ---
 
-### 8주차 — 테스트 + 안정화 + Month 2 마일스톤
+### 8주차 — UI 폴리싱 + 테스트 + 안정화 + Month 2 마일스톤
 - [ ] Kafka 실제 스키마 연동 (김찬영·양성호 확정 후 mock → 실데이터 교체)
 - [ ] Jest 컴포넌트 테스트 (IssueList, useWebSocket)
 - [ ] k6 API 부하 테스트
 - [ ] 상태 관리 성능 검토 (Context 유지 or Zustand 전환)
 - [ ] 전체 E2E 시나리오 테스트 (로그인 → 이슈 상세 → 알림 설정 흐름)
-- [ ] UI 폴리싱 (Lighthouse 성능 점수 확인)
+- [x] UI 폴리싱 — stone 테마 + amber 액센트 + Playfair Display 서체 전체 적용
+- [x] Archive 페이지 개편 — 월별 그룹핑, 기간 필터(3개월/6개월/1년), 그룹별 더보기, 정렬(최신순/편집 많은순)
+- [x] Trend 이슈 피드 개편 — 상태별 좌측 컬러 보더, 상대 시간, 검색 아이콘 통합
+- [x] 홈 페이지 개편 — 미니멀 랜딩, 이슈 미리보기 카드 클릭 전체 링크
+- [x] 네비게이션 개편 — 페이지명 영문화(Trend/Archive), 설정 톱니바퀴 아이콘
+- [x] 접근성 개선 — 소형 텍스트·저대비 색상 전면 개선
+- [x] GET /issues/{id} — archived 이슈 ID 조회 지원 추가
+- [x] mock 아카이브 데이터 10건으로 확장, 월별 분산 배치
+- [ ] 라이트/다크 테마 전환 (next-themes + dark: 변형 — 실데이터 연동 후 진행)
 - [ ] 팀 데모 준비
 
 ✅ **Month 2 마일스톤**: Wikipedia SSE → 폭증 감지 → Reddit 수집 → NLP + LLM 브리핑 → 대시보드 E2E 완성, Keycloak SSO + CloudFront 배포 + Discord 알림 전부 동작
