@@ -183,3 +183,34 @@ npm error Could not read package.json
 ```bash
 cd frontend && npm install && npm run dev
 ```
+
+---
+
+## 8. WebSocket 잘못된 토큰 시 TestClient hang
+
+**증상**
+잘못된 토큰으로 WebSocket 연결 시 테스트가 타임아웃으로 멈춥니다.
+
+**원인**
+WebSocket 핸들러에서 `verify_jwt`가 `HTTPException`을 raise하면, FastAPI가 이를 HTTP 응답으로 처리하려다 WebSocket transport가 열린 채로 멈춥니다. WebSocket은 HTTP 예외가 아니라 WebSocket close frame으로 거부해야 합니다.
+
+**해결**
+`HTTPException`을 catch해서 `websocket.close(1008)`로 명시적으로 닫습니다.
+
+```python
+# 변경 전
+@router.websocket("/ws/issues")
+async def issue_stream(websocket: WebSocket, token: str = Query(...)):
+    verify_jwt(token)  # HTTPException raise → hang
+    await websocket.accept()
+
+# 변경 후
+@router.websocket("/ws/issues")
+async def issue_stream(websocket: WebSocket, token: str = Query(...)):
+    try:
+        verify_jwt(token)
+    except HTTPException:
+        await websocket.close(code=1008)  # 1008: Policy Violation
+        return
+    await websocket.accept()
+```

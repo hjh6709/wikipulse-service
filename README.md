@@ -87,11 +87,15 @@ npm run dev
 - **Mock Mode** — `USE_MOCK=true` 설정으로 Kafka/Keycloak 없이 전체 기능 로컬 테스트 가능
 - **Redis Cache** — 이슈 목록 60초 캐시, Redis 미연결 시 자동 fallback
 - **JWT Auth** — next-auth 기반 인증, 미로그인 시 `/login` 자동 redirect
-- **WebSocket** — 실시간 감성 분석/브리핑/스파이크 이벤트 스트리밍 (Week 3)
+- **WebSocket** — 실시간 감성 분석/브리핑/스파이크/댓글 이벤트 스트리밍
+- **Landing Page** — 비로그인 트렌딩 이슈 미리보기 3개 (`GET /issues?preview=true`)
+- **Reddit Comment Feed** — 실시간 댓글 피드, 최신순/인기순 정렬, 3줄 truncate + 더보기
+- **Issue Timeline** — 이슈 생애주기 타임라인 (REST API 초기 로드)
 
 ## Roadmap
 
-- [x] Week 1 — FastAPI + Next.js 14 프로젝트 scaffold, Docker Compose, OpenAPI 스키마
+- [x] Week 1 — FastAPI + Next.js 14 프로젝트 scaffold, Docker Compose, Swagger UI (`/docs`)
 - [x] Week 2 — 로그인 플로우, 이슈 리스트, Redis 캐시, 세션 토큰 연동
-- [ ] Week 3 — WebSocket 서버, Kafka consume, 실시간 차트 (Recharts)
-- [ ] Week 4 — AI 브리핑 카드, 알림 설정, Lambda 연동, E2E 테스트
+- [x] Week 3 — WebSocket 서버, Kafka consume, 실시간 차트 (Recharts)
+- [x] Week 4 — AI 브리핑 카드, Reddit 댓글 피드, 이슈 타임라인, 랜딩 페이지, E2E pytest (12개)
+- [ ] Week 5 — Kong Gateway 연동, 유저 API, 북마크, 이슈 검색
