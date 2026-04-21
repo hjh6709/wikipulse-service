@@ -1,0 +1,34 @@
+[
+  {
+    "event_id": "t-001",
+    "issue_id": "issue-1",
+    "type": "spike",
+    "label": "편집 폭증 감지",
+    "description": "5분 내 편집 횟수 22회 — 평소 대비 4배",
+    "timestamp": "2026-04-20T00:00:00Z"
+  },
+  {
+    "event_id": "t-002",
+    "issue_id": "issue-1",
+    "type": "reddit",
+    "label": "Reddit 대화 급증",
+    "description": "r/worldnews 댓글 150개 이상 생성",
+    "timestamp": "2026-04-20T00:05:00Z"
+  },
+  {
+    "event_id": "t-003",
+    "issue_id": "issue-1",
+    "type": "sentiment",
+    "label": "감성 변화",
+    "description": "부정 댓글 비율 60% 초과",
+    "timestamp": "2026-04-20T00:10:00Z"
+  },
+  {
+    "event_id": "t-004",
+    "issue_id": "issue-1",
+    "type": "briefing",
+    "label": "AI 브리핑 생성",
+    "description": "Gemini가 이슈 요약 브리핑 생성 완료",
+    "timestamp": "2026-04-20T00:15:00Z"
+  }
+]

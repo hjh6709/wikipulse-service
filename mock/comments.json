@@ -1,0 +1,47 @@
+[
+  {
+    "comment_id": "r-001",
+    "issue_id": "issue-1",
+    "author": "u/wiki_watcher",
+    "body": "This article has been edited over 20 times in the last hour. Something big is happening.",
+    "score": 142,
+    "sentiment": "neutral",
+    "created_at": "2026-04-20T00:00:00Z"
+  },
+  {
+    "comment_id": "r-002",
+    "issue_id": "issue-1",
+    "author": "u/history_buff",
+    "body": "The sources being added are clearly biased. Someone is trying to push a narrative here.",
+    "score": 87,
+    "sentiment": "negative",
+    "created_at": "2026-04-20T00:01:30Z"
+  },
+  {
+    "comment_id": "r-003",
+    "issue_id": "issue-1",
+    "author": "u/neutral_observer",
+    "body": "Both sides are making valid points. Let the editors sort it out.",
+    "score": 56,
+    "sentiment": "neutral",
+    "created_at": "2026-04-20T00:03:00Z"
+  },
+  {
+    "comment_id": "r-004",
+    "issue_id": "issue-1",
+    "author": "u/breaking_news_fan",
+    "body": "This is exactly what Wikipedia is for — real-time documentation of events as they unfold!",
+    "score": 203,
+    "sentiment": "positive",
+    "created_at": "2026-04-20T00:04:30Z"
+  },
+  {
+    "comment_id": "r-005",
+    "issue_id": "issue-1",
+    "author": "u/skeptic99",
+    "body": "Half of these edits are being reverted immediately. Classic edit war.",
+    "score": 34,
+    "sentiment": "negative",
+    "created_at": "2026-04-20T00:06:00Z"
+  }
+]

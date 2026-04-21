@@ -33,5 +33,5 @@ class AlertSettings(BaseModel):
 
 
 class WSMessage(BaseModel):
-    type: Literal["sentiment", "briefing", "spike"]
+    type: Literal["sentiment", "briefing", "spike", "comment"]
     data: dict

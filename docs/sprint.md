@@ -119,26 +119,32 @@ wikipulse-service/
 
 ---
 
-### 3주차 — WebSocket + 실시간 차트 (진행 중)
-- [ ] `WS /ws/issues` WebSocket 서버 구현
-- [ ] Kafka `sentiment-results` consume → WebSocket broadcast
-- [ ] `useWebSocket` 커스텀 훅 구현 (자동 재연결 포함)
-- [ ] 편집 스파이크 그래프 (Recharts)
-- [ ] 감성 분포 차트 (실시간)
-- [ ] mock 데이터로 E2E 테스트
+### 3주차 — WebSocket + 실시간 차트 ✅
+- [x] `WS /ws/issues` WebSocket 서버 구현
+- [x] Kafka `sentiment-results` consume → WebSocket broadcast
+- [x] `useWebSocket` 커스텀 훅 구현 (자동 재연결 포함)
+- [x] 편집 스파이크 그래프 (Recharts)
+- [x] 감성 분포 차트 (실시간)
+- [x] mock 데이터로 E2E 테스트
 
-✅ **완료 기준**: mock 데이터로 스파이크 그래프·감성 차트 실시간 업데이트 확인
+> 비고: `_MOCK_DIR = Path(__file__).parents[4]` → `parents[3]` 수정 (경로 오류로 mock 데이터 미전송), `authOptions` → `lib/auth.ts` 분리 (Next.js route 파일 타입 충돌), Session 타입에 `accessToken` 추가
+
+✅ **완료 기준**: mock 데이터로 스파이크 그래프·감성 차트 실시간 업데이트 확인 ✅
 
 ---
 
-### 4주차 — Reddit 피드 + 타임라인 + Month 1 마일스톤
-- [ ] Kafka `briefings` consume → WebSocket broadcast
-- [ ] `GET /issues/{id}/briefing` 구현
-- [ ] `POST /settings/alerts` + Lambda 트리거 연동
-- [ ] Reddit 댓글 피드 컴포넌트
-- [ ] 이슈 타임라인 컴포넌트
-- [ ] AI 브리핑 카드 프로토타입
-- [ ] E2E 시나리오 테스트 + 팀 데모
+### 4주차 — Reddit 피드 + 타임라인 + Month 1 마일스톤 (진행 중)
+- [x] Kafka `briefings` consume → WebSocket broadcast
+- [x] `GET /issues/{id}/briefing` 구현 (mock 데이터 반환)
+- [x] `POST /settings/alerts` + Lambda 트리거 연동
+- [x] Reddit 댓글 피드 컴포넌트 (3줄 truncate + 더보기, WebSocket comment 타입)
+- [x] 이슈 타임라인 컴포넌트 (REST API 초기 로드)
+- [x] AI 브리핑 카드 프로토타입
+- [x] 랜딩 페이지 (비로그인 이슈 미리보기 3개, `GET /issues?preview=true`)
+- [x] E2E 시나리오 테스트 (pytest 12개 통과 — REST API + WebSocket mock)
+- [ ] 팀 데모
+
+> 비고: `reddit-comments` Kafka 토픽 추가 확인 (김찬영), Kong 비로그인 예외 설정 필요 (윤승호), WS 잘못된 토큰 시 1008 close 처리 추가
 
 ✅ **Month 1 마일스톤**: 편집 폭증 이벤트 → 대시보드 실시간 반영 E2E 흐름 동작
 
@@ -497,7 +503,7 @@ frontend/
 
 | 협업 대상 | 필요한 것 | 시점 |
 |---|---|---|
-| 김찬영 (데이터팀) | Kafka 토픽 스키마 확정, 이슈 생애주기 상태(발생/확산/정점/소강) 판단 주체 결정 | 3주차 중 |
+| 김찬영 (데이터팀) | Kafka 토픽 스키마 확정 (`reddit-comments` 포함), 이슈 생애주기 상태 판단 주체 결정 | 3주차 중 |
 | 양성호 (AI팀) | Gemini 브리핑 JSON 포맷, WebSocket 메시지 타입 합의, sentiment_score 정의, 중립성 프롬프트 가이드라인 | 3주차 중 |
 | 윤승호 (DevSecOps) | Keycloak realm/client 설정, Kong WebSocket 지원 여부, Keycloak self-registration 허용 여부 | 5~6주차 |
 | 김용균 (인프라) | ArgoCD 템플릿, Kong 운영 준비 시점, CloudFront 배포 방식 확정, 유저 데이터 영구 저장 DB 결정 (PostgreSQL 여부) | 5~7주차 |

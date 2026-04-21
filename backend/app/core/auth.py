@@ -22,3 +22,11 @@ async def get_current_user(
     if credentials is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
     return verify_jwt(credentials.credentials)
+
+
+async def get_optional_user(
+    credentials: HTTPAuthorizationCredentials | None = Security(_bearer),
+) -> dict | None:
+    if credentials is None:
+        return None
+    return verify_jwt(credentials.credentials)

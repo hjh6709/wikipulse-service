@@ -2,16 +2,16 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.core.auth import get_current_user
+from app.core.auth import get_current_user, get_optional_user
 from app.core.config import settings
 from app.schemas import Briefing, Issue, SentimentResult
 from app.services.redis_client import get_issues_cached, set_issues_cached
 
 router = APIRouter(prefix="/issues", tags=["issues"])
 
-_MOCK_DIR = Path(__file__).parents[4] / "mock"
+_MOCK_DIR = Path(__file__).parents[3] / "mock"
 
 
 def _load_mock(filename: str) -> list[dict] | dict:
@@ -33,14 +33,12 @@ def _mock_issues() -> list[dict]:
 
 
 @router.get("", response_model=list[Issue])
-async def get_issues(_: dict = Depends(get_current_user)):
+async def get_issues(preview: bool = Query(False), _: dict | None = Depends(get_optional_user)):
     cached = await get_issues_cached()
-    if cached:
-        return cached
-
-    data = _mock_issues() if settings.use_mock else []
-    await set_issues_cached(data)
-    return data
+    data = cached or (_mock_issues() if settings.use_mock else [])
+    if not cached:
+        await set_issues_cached(data)
+    return data[:3] if preview else data
 
 
 @router.get("/{issue_id}/briefing", response_model=Briefing)
@@ -64,4 +62,8 @@ async def get_sentiment(issue_id: str, _: dict = Depends(get_current_user)):
 
 @router.get("/{issue_id}/timeline")
 async def get_timeline(issue_id: str, _: dict = Depends(get_current_user)):
+    if settings.use_mock:
+        events = _load_mock("timeline.json")
+        items = events if isinstance(events, list) else [events]
+        return {"issue_id": issue_id, "events": [{**e, "issue_id": issue_id} for e in items]}
     return {"issue_id": issue_id, "events": []}

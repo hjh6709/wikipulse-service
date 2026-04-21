@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 type WSMessage = {
-  type: "sentiment" | "briefing" | "spike";
+  type: "sentiment" | "briefing" | "spike" | "comment";
   data: Record<string, unknown>;
 };
 
@@ -13,6 +13,8 @@ export function useWebSocket(url: string) {
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
+    if (!url) return;
+
     function connect() {
       const ws = new WebSocket(url);
       wsRef.current = ws;

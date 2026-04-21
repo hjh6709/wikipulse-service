@@ -114,6 +114,27 @@ AI팀이 생성한 이슈 요약 브리핑입니다.
 
 ## Kafka 토픽
 
+### reddit-comments
+
+데이터팀(김찬영)이 Reddit 댓글 원문을 수집해서 발행합니다.
+서비스팀(한정현)과 AI팀(양성호) 둘 다 consume합니다.
+
+```json
+{
+  "comment_id": "string",
+  "post_id": "string",
+  "issue_id": "string",
+  "author": "string",
+  "body": "string",
+  "score": 142,
+  "created_at": "2026-04-20T00:00:00Z"
+}
+```
+
+> 실제 스키마 확정 전까지 `mock/comments.json` 기준으로 개발
+
+---
+
 ### sentiment-results
 
 AI팀(양성호)이 Reddit 댓글 감성 분석 결과를 발행합니다.
@@ -176,6 +197,7 @@ AI팀(양성호)이 Gemini 브리핑 결과를 발행합니다.
 { "type": "sentiment", "data": { ...SentimentResult } }
 { "type": "briefing",  "data": { ...Briefing } }
 { "type": "spike",     "data": { "wiki_page": "...", "edit_count": 22, "window": "5m" } }
+{ "type": "comment",   "data": { ...reddit-comments } }
 ```
 
 > `type` 필드 값 및 `data` 구조 최종 합의 — 김찬영, 양성호 확인 필요
@@ -186,11 +208,13 @@ AI팀(양성호)이 Gemini 브리핑 결과를 발행합니다.
 
 | 항목 | 확인 대상 | 시점 |
 |---|---|---|
-| `edit_count` window 크기, `spike_score` 계산 방식 | 김찬영 | 3주차 |
-| `wiki_page` 타입 (URL 전체 vs 슬러그 vs 문서 제목) | 김찬영 | 3주차 |
-| Issue `status` 판단 주체 (Kafka Streams vs 서비스팀) | 김찬영 | 3주차 |
-| `sentiment` 분류 세분화 여부, `sentiment_score` 정확한 의미 | 양성호 | 3주차 |
-| 브리핑 생성 주기, key_points 개수, 중립성 프롬프트 가이드라인 | 양성호 | 3주차 |
-| WebSocket 메시지 type/data 구조 최종 합의 | 김찬영, 양성호 | 3주차 |
+| `edit_count` window 크기, `spike_score` 계산 방식 | 김찬영 | 4주차 |
+| `wiki_page` 타입 (URL 전체 vs 슬러그 vs 문서 제목) | 김찬영 | 4주차 |
+| Issue `status` 판단 주체 (Kafka Streams vs 서비스팀) | 김찬영 | 4주차 |
+| `reddit-comments` 토픽 스키마 확정 (필드, score 필드명 등) | 김찬영 | 4주차 |
+| `sentiment` 분류 세분화 여부, `sentiment_score` 정확한 의미 | 양성호 | 4주차 |
+| 브리핑 생성 주기, key_points 개수, 중립성 프롬프트 가이드라인 | 양성호 | 4주차 |
+| WebSocket 메시지 type/data 구조 최종 합의 | 김찬영, 양성호 | 4주차 |
+| Kong JWT 검증 예외 경로 설정 (`GET /issues?preview=true`) | 윤승호 | 5주차 |
 | 유저 데이터 영구 저장 DB (PostgreSQL 여부, 온프렘 K8s vs RDS) | 김용균 | 5주차 |
 | Keycloak self-registration 허용 여부 | 윤승호 | 5주차 |
