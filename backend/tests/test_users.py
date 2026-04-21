@@ -4,6 +4,7 @@ import pytest
 
 @pytest.mark.asyncio
 async def test_get_me(client, auth_headers):
+    """[비동기 FastAPI 통합 테스트용 클라이언트] 내 정보를 정상적으로 가져오는지 확인합니다."""
     r = await client.get("/users/me", headers=auth_headers)
     assert r.status_code == 200
     data = r.json()
@@ -14,12 +15,14 @@ async def test_get_me(client, auth_headers):
 
 @pytest.mark.asyncio
 async def test_get_me_requires_auth(client):
+    """[비동기 FastAPI 통합 테스트용 클라이언트] 인증 정보가 없을 때 401 에러를 반환하는지 확인합니다."""
     r = await client.get("/users/me")
     assert r.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_patch_me(client, auth_headers):
+    """[비동기 FastAPI 통합 테스트용 클라이언트] 사용자 정보를 수정했을 때 정상 반영되는지 확인합니다."""
     r = await client.patch("/users/me", json={"username": "newname"}, headers=auth_headers)
     assert r.status_code == 200
     assert r.json()["username"] == "newname"
@@ -27,6 +30,7 @@ async def test_patch_me(client, auth_headers):
 
 @pytest.mark.asyncio
 async def test_bookmarks_crud(client, auth_headers):
+    """[비동기 FastAPI 통합 테스트용 클라이언트] 북마크의 생성, 조회, 삭제 흐름을 통합 검증합니다."""
     # 초기 빈 목록
     r = await client.get("/users/bookmarks", headers=auth_headers)
     assert r.status_code == 200
@@ -53,6 +57,7 @@ async def test_bookmarks_crud(client, auth_headers):
 
 @pytest.mark.asyncio
 async def test_preferences(client, auth_headers):
+    """[비동기 FastAPI 통합 테스트용 클라이언트] 사용자 카테고리 선호도 저장 및 조회 로직을 확인합니다."""
     # 초기 빈 목록
     r = await client.get("/users/preferences", headers=auth_headers)
     assert r.status_code == 200

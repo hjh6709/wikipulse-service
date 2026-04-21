@@ -45,6 +45,9 @@ async def _consume(topics: list[str]) -> None:
     try:
         async for msg in consumer:
             await _queue.put({"topic": msg.topic, "data": msg.value})
+            if msg.topic == "alerts":
+                from app.services.redis_client import invalidate_issues_cache
+                await invalidate_issues_cache()
     except Exception as e:
         _kafka_healthy = False
         logger.error("Kafka consumer error: %s", e)

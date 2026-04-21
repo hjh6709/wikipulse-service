@@ -40,6 +40,8 @@ def _mock_issues() -> list[dict]:
 async def get_issues(
     preview: bool = Query(False),
     q: str | None = Query(None),
+    cursor: str | None = Query(None),
+    limit: int = Query(5, ge=1, le=50),
     _: dict | None = Depends(get_optional_user),
 ):
     cached = await get_issues_cached()
@@ -49,7 +51,13 @@ async def get_issues(
     if q:
         q_lower = q.lower()
         data = [d for d in data if q_lower in d.get("title", "").lower()]
-    return data[:3] if preview else data
+    if preview:
+        return data[:3]
+    if cursor:
+        ids = [d["issue_id"] for d in data]
+        start = ids.index(cursor) + 1 if cursor in ids else 0
+        data = data[start:]
+    return data[:limit]
 
 
 @router.get("/archived", response_model=list[Issue])

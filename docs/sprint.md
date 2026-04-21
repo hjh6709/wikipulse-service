@@ -68,9 +68,11 @@ wikipulse-service/
 │   │   ├── SentimentChart.tsx
 │   │   ├── BriefingCard.tsx
 │   │   ├── CommentFeed.tsx
-│   │   └── IssueTimeline.tsx
+│   │   ├── IssueTimeline.tsx
+│   │   └── SystemBanner.tsx
 │   ├── hooks/
-│   │   └── useWebSocket.ts
+│   │   ├── useWebSocket.ts
+│   │   └── useHealth.ts
 │   ├── lib/
 │   │   └── api.ts
 │   └── Dockerfile
@@ -151,37 +153,34 @@ wikipulse-service/
 
 ---
 
-### 5주차 — 유저 API + 에러 처리 + 검색 (진행 중)
+### 5주차 — 유저 API + 에러 처리 + 검색 ✅
 - [ ] Kong Gateway 실제 연동 (김용균 ArgoCD 템플릿 기준)
 - [ ] WebSocket 인증 방식 확정 (윤승호 확인 후 Kong 플러그인 or FastAPI 직접 유지)
 - [x] Kafka consume 실패 에러 처리 (재시도 3회 + `_kafka_healthy` 플래그 + `/health` 노출)
-- [ ] Redis 장애 fallback 고도화
-- [ ] Kafka 장애 시 프론트 "데이터 로딩 중" 배너
+- [x] Redis 장애 fallback 고도화 (소켓 타임아웃 2s + `_redis_healthy` 플래그 + `/health` 노출)
+- [x] Kafka/Redis 장애 시 프론트 경고 배너 (`useHealth` 훅 + `SystemBanner` 컴포넌트)
 - [x] 유저 설정 API (`GET /users/me`, `PATCH /users/me`)
 - [x] 북마크 API (`GET /users/bookmarks`, `POST /users/bookmarks`, `DELETE /users/bookmarks/{id}`)
 - [x] 관심 카테고리 API (`GET /users/preferences`, `POST /users/preferences`)
 - [x] 이슈 검색 API (`GET /issues?q=keyword`) + 프론트 검색바 연동
 - [x] 아카이브 이슈 API (`GET /issues/archived`)
 - [x] Issue 스키마에 `status` 필드 추가 + 프론트 뱃지 표시
-- [ ] 설정 페이지 API 연동 (`/settings/bookmarks`, `/settings/preferences`, `/settings/account`)
+- [x] 설정 페이지 API 연동 (`/settings/account`, `/settings/bookmarks`, `/settings/preferences`)
 
 ✅ **완료 기준**: Kong 통해서 API 호출 성공 + 에러 상황에서 UI가 멈추지 않음
 
 ---
 
-### 6주차 — Keycloak SSO + 설정 페이지 완성
+### 6주차 — Keycloak SSO + 네비게이션 + 알림
 - [ ] Keycloak 실제 서버 연동 (윤승호 realm/client 설정 기준)
 - [ ] next-auth CredentialsProvider → KeycloakProvider 교체
-- [ ] `/onboarding` 페이지 구현 (첫 로그인 시 관심 카테고리 선택)
-- [ ] `/settings/account` API 연동 (`GET/PATCH /users/me`)
-- [ ] `/settings/bookmarks` API 연동 (`GET/DELETE /users/bookmarks`)
-- [ ] `/settings/preferences` API 연동 (`GET/POST /users/preferences`)
-- [ ] `/settings/alerts` 알림 설정 폼 완성 (`POST /settings/alerts`)
-- [ ] 네비게이션/헤더 컴포넌트 (로그인 상태, 메뉴 링크)
-- [ ] Redis TTL 전략 조정 (alerts 이벤트 시 캐시 무효화 추가)
+- [x] `/onboarding` 페이지 구현 (첫 로그인 시 관심 카테고리 선택)
+- [x] `/settings/alerts` 알림 설정 폼 완성 (`POST /alerts/settings`)
+- [x] 네비게이션/헤더 컴포넌트 (로그인 상태, 메뉴 링크)
+- [x] Redis TTL 전략 조정 (alerts 이벤트 수신 시 캐시 즉시 무효화)
 - [ ] AI 브리핑 카드 완성 (WebSocket 실시간)
 - [ ] API 응답 포맷 표준화 적용 (`{ status, data }` 구조)
-- [ ] JSON 로그 포맷 적용 (structlog, 조승연 FluentBit 파서 기준)
+- [x] JSON 로그 포맷 적용 (structlog, 조승연 FluentBit 파서 기준)
 
 ✅ **완료 기준**: Keycloak 로그인 → 설정 페이지 실제 저장/조회 동작
 
@@ -189,15 +188,15 @@ wikipulse-service/
 
 ### 7주차 — Lambda 알림 + CloudFront 배포 + 히스토리
 - [ ] Lambda Discord/이메일 알림 완성 (EventBridge 트리거)
-- [ ] `/history` 페이지 구현 (`GET /issues/archived` 연동, 키워드 검색)
-- [ ] `GET /issues` 페이지네이션 추가 (cursor 기반)
-- [ ] 404 페이지 구현
-- [ ] 로딩 스켈레톤 UI (이슈 리스트, 이슈 상세)
+- [x] `/history` 페이지 구현 (`GET /issues/archived` 연동, 키워드 검색)
+- [x] `GET /issues` cursor 기반 페이지네이션 + 프론트 "더 보기" 버튼
+- [x] 404 페이지 구현
+- [x] 로딩 스켈레톤 UI (이슈 리스트, 이슈 상세)
 - [ ] 토픽 클러스터 시각화 컴포넌트
 - [ ] CloudFront 배포 방식 확정 (김용균과 옵션 A/B 결정 후 적용)
 - [ ] k8s/ 폴더 Deployment·Service yaml 추가 (인프라팀 템플릿 기준)
-- [ ] 환경별 설정 분리 (.env.local / .env.production)
-- [ ] Dockerfile 멀티스테이지 빌드 최적화
+- [x] 환경별 설정 분리 (.env.local / .env.production)
+- [x] Dockerfile 멀티스테이지 빌드 최적화 (백엔드)
 
 ✅ **완료 기준**: Discord 알림 수신 확인 + CloudFront URL로 대시보드 접근 가능
 
@@ -512,7 +511,7 @@ frontend/
 
 | 협업 대상 | 필요한 것 | 시점 |
 |---|---|---|
-| 김찬영 (데이터팀) | Kafka 토픽 스키마 확정 (`reddit-comments` 포함), 이슈 생애주기 상태 판단 주체 결정 | 3주차 중 |
+| 김찬영 (데이터팀) | Kafka 토픽 스키마 확정 (`reddit-comments` 포함), 이슈 생애주기 상태 판단 주체 결정, `alerts` 토픽 메시지에 `status` 필드 포함 요청 (발생/확산/정점/소강 실시간 업데이트용) | 3주차 중 |
 | 양성호 (AI팀) | Gemini 브리핑 JSON 포맷, WebSocket 메시지 타입 합의, sentiment_score 정의, 중립성 프롬프트 가이드라인 | 3주차 중 |
 | 윤승호 (DevSecOps) | Keycloak realm/client 설정, Kong WebSocket 지원 여부, Keycloak self-registration 허용 여부 | 5~6주차 |
 | 김용균 (인프라) | ArgoCD 템플릿, Kong 운영 준비 시점, CloudFront 배포 방식 확정, 유저 데이터 영구 저장 DB 결정 (PostgreSQL 여부) | 5~7주차 |

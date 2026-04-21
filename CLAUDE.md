@@ -5,43 +5,43 @@ Solo fullstack: FastAPI backend + Next.js 14 frontend
 Consume Kafka output from data/AI team → serve to browser
 
 ## Stack
-- Backend: Python 3.11, FastAPI, aiokafka, redis[asyncio], python-jose, boto3, Poetry
+- Backend: Python 3.11, FastAPI, aiokafka, redis[asyncio], python-jose, boto3, Poetry, structlog
 - Frontend: Next.js 14 (App Router, TS), Tailwind, Recharts, next-auth
 - Infra: Kong Gateway, ElastiCache Redis, AWS Lambda, CloudFront, Keycloak OIDC
 
 ## API
 ```
-GET  /issues
-GET  /issues/{id}/briefing
-GET  /issues/{id}/sentiment
-GET  /issues/{id}/timeline
-POST /settings/alerts
-WS   /ws/issues
+GET    /issues
+GET    /issues/archived
+GET    /issues/{id}/briefing
+GET    /issues/{id}/sentiment
+GET    /issues/{id}/timeline
+POST   /alerts/settings
+GET    /users/me
+PATCH  /users/me
+GET    /users/bookmarks
+POST   /users/bookmarks
+DELETE /users/bookmarks/{id}
+GET    /users/preferences
+POST   /users/preferences
+WS     /ws/issues
 ```
 
 ## Kafka (consume only)
 - `reddit-comments` → Reddit comment raw text (data team, 김찬영)
 - `sentiment-results` → DistilBERT sentiment result per comment (AI team, 양성호)
 - `briefings` → Gemini briefing (AI team, 양성호)
-- `alerts` → spike event (data team, 김찬영)
+- `alerts` → spike event (data team, 김찬영) — status 필드 추가 요청 필요
 
-## Now (Week 5)
+## Pending (team dependencies)
+- [ ] Keycloak SSO (next-auth KeycloakProvider, 윤승호 realm/client)
 - [ ] Kong Gateway integration (김용균 ArgoCD template)
 - [ ] WebSocket auth method finalize (윤승호 confirm)
-- [x] Kafka consume failure error handling (재시도 3회 + _kafka_healthy 플래그 + /health 노출)
-- [x] GET /users/me, PATCH /users/me
-- [x] Bookmark API (GET/POST/DELETE /users/bookmarks)
-- [x] Preferences API (GET/POST /users/preferences)
-- [x] Issue search (GET /issues?q=keyword)
-- [x] Issue status field (발생/확산/정점/소강)
-- [x] Archive issues API (GET /issues/archived)
-
-## Done (Week 4)
-- [x] Reddit comment feed (truncate + sort toggle)
-- [x] Issue timeline component
-- [x] AI briefing card
-- [x] Landing page (unauthenticated preview, GET /issues?preview=true)
-- [x] E2E pytest (12 tests: REST API + WebSocket)
+- [ ] Lambda Discord/email alert (EventBridge, AWS)
+- [ ] CloudFront deployment (김용균 confirm)
+- [ ] k8s Deployment/Service yaml (인프라팀 template)
+- [ ] alerts 토픽 status 필드 확인 (김찬영) → WebSocket 실시간 status 업데이트 구현
+- [ ] Kafka real schema integration (mock → 실데이터, 김찬영·양성호 확정 후)
 
 ## Notes
 - Kafka schema TBD → use mock/ JSON
@@ -49,4 +49,5 @@ WS   /ws/issues
 - aioredis replaced with redis[asyncio] (distutils removed in Python 3.12+)
 - next.config.ts → next.config.mjs (not supported in Next.js 14.2)
 - WS invalid token → close(1008) (not HTTPException raise)
+- alerts 토픽 status 필드 → 김찬영 확인 후 WebSocket spike 메시지에 status 포함 예정
 - Sprint detail → docs/sprint.md

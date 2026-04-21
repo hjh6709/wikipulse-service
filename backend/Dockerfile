@@ -1,13 +1,16 @@
+FROM python:3.11-slim AS builder
+
+RUN pip install poetry==1.8.2
+WORKDIR /app
+COPY pyproject.toml poetry.lock* ./
+RUN poetry export -f requirements.txt --without-hashes -o requirements.txt
+
 FROM python:3.11-slim
 
 WORKDIR /app
-
-RUN pip install poetry==1.8.2 && \
-    poetry config virtualenvs.create false
-
-COPY pyproject.toml poetry.lock* ./
-RUN poetry install --no-root --no-interaction
+COPY --from=builder /app/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app/ ./app/
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
