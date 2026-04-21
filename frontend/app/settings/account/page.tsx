@@ -41,29 +41,29 @@ export default function AccountPage() {
     <div className="space-y-6">
       <h2 className="text-lg font-semibold">계정 정보</h2>
 
-      <form onSubmit={handleSave} className="rounded-xl border border-gray-800 bg-gray-900 p-6 space-y-4">
+      <form onSubmit={handleSave} className="rounded-xl border border-stone-800 bg-stone-900 p-6 space-y-4">
         <div className="space-y-1">
-          <label className="text-xs text-gray-500">이름</label>
+          <label className="text-sm text-stone-300">이름</label>
           <input
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full rounded-lg bg-gray-800 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-lg bg-stone-800 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-amber-500"
           />
         </div>
         <div className="space-y-1">
-          <label className="text-xs text-gray-500">이메일</label>
+          <label className="text-sm text-stone-300">이메일</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg bg-gray-800 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-lg bg-stone-800 px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-amber-500"
           />
         </div>
         <div className="flex items-center gap-3">
           <button
             type="submit"
             disabled={saving || !user}
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500 disabled:opacity-50 transition-colors"
+            className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium hover:bg-amber-500 disabled:opacity-50 transition-colors"
           >
             {saving ? "저장 중..." : "저장"}
           </button>
@@ -71,8 +71,8 @@ export default function AccountPage() {
         </div>
       </form>
 
-      <div className="rounded-xl border border-gray-800 bg-gray-900 p-6">
-        <p className="text-sm text-gray-500">비밀번호 변경 — Keycloak 연동 후 제공 예정</p>
+      <div className="rounded-xl border border-stone-800 bg-stone-900 p-6">
+        <p className="text-sm text-stone-400">비밀번호 변경 — Keycloak 연동 후 제공 예정</p>
       </div>
     </div>
   );

@@ -9,7 +9,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        brand: "#2563eb",
+        brand: "#d97706",
+      },
+      fontFamily: {
+        display: ["var(--font-display)", "Georgia", "serif"],
       },
     },
   },

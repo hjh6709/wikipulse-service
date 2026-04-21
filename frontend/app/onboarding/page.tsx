@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { savePreferences } from "@/lib/api";
 
-const CATEGORIES = ["정치", "경제", "스포츠", "연예", "사회·범죄", "과학·기술"];
+const CATEGORIES = ["정치", "경제", "스포츠", "연예", "사회", "과학·기술"];
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -37,11 +37,11 @@ export default function OnboardingPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold">WikiPulse에 오신 것을 환영합니다</h1>
-          <p className="text-sm text-gray-400">관심 있는 카테고리를 선택하면 맞춤 이슈를 먼저 보여드립니다.</p>
+          <p className="text-sm text-stone-400">관심 있는 카테고리를 선택하면 맞춤 이슈를 먼저 보여드립니다.</p>
         </div>
 
-        <div className="rounded-xl border border-gray-800 bg-gray-900 p-6 space-y-4">
-          <p className="text-sm text-gray-400">관심 카테고리 <span className="text-gray-600">(선택 사항)</span></p>
+        <div className="rounded-xl border border-stone-800 bg-stone-900 p-6 space-y-4">
+          <p className="text-sm text-stone-400">관심 카테고리 <span className="text-stone-500">(선택 사항)</span></p>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((cat) => (
               <button
@@ -49,8 +49,8 @@ export default function OnboardingPage() {
                 onClick={() => toggle(cat)}
                 className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
                   selected.includes(cat)
-                    ? "border-indigo-500 bg-indigo-500/10 text-indigo-400"
-                    : "border-gray-700 text-gray-400 hover:border-gray-600"
+                    ? "border-amber-500 bg-amber-500/10 text-amber-500"
+                    : "border-stone-700 text-stone-400 hover:border-stone-600"
                 }`}
               >
                 {cat}
@@ -62,14 +62,14 @@ export default function OnboardingPage() {
         <button
           onClick={handleStart}
           disabled={saving}
-          className="w-full rounded-lg bg-indigo-600 py-3 text-sm font-medium hover:bg-indigo-500 disabled:opacity-50 transition-colors"
+          className="w-full rounded-lg bg-amber-600 py-3 text-sm font-medium hover:bg-amber-500 disabled:opacity-50 transition-colors"
         >
           {saving ? "저장 중..." : "시작하기"}
         </button>
 
         <button
           onClick={() => router.push("/issues")}
-          className="w-full text-sm text-gray-600 hover:text-gray-400 transition-colors"
+          className="w-full text-sm text-stone-400 hover:text-stone-300 transition-colors"
         >
           건너뛰기
         </button>

@@ -14,18 +14,18 @@ export default function SettingsNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="w-36 shrink-0">
-      <ul className="space-y-1">
+    <nav className="w-32 shrink-0">
+      <ul className="space-y-0.5">
         {NAV.map((item) => {
           const active = pathname === item.href;
           return (
             <li key={item.href}>
               <Link
                 href={item.href}
-                className={`block rounded-lg px-3 py-2 text-sm transition-colors ${
+                className={`block border-l-2 px-3 py-2 text-sm transition-colors ${
                   active
-                    ? "bg-gray-800 text-white font-medium"
-                    : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                    ? "border-amber-500 text-white font-medium"
+                    : "border-transparent text-stone-400 hover:text-white hover:border-stone-600"
                 }`}
               >
                 {item.label}

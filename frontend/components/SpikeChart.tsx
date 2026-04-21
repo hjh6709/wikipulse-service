@@ -35,7 +35,7 @@ export function SpikeChart({ spikeData }: Props) {
 
   if (points.length === 0) {
     return (
-      <div className="flex items-center justify-center h-40 text-sm text-gray-500">
+      <div className="flex items-center justify-center h-40 text-sm text-stone-400">
         데이터 수신 대기 중...
       </div>
     );

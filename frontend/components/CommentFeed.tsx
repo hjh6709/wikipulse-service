@@ -11,13 +11,19 @@ type Comment = {
   created_at: string;
 };
 
-const SENTIMENT_COLOR = {
-  positive: "text-green-400",
-  negative: "text-red-400",
-  neutral: "text-gray-400",
+const SENTIMENT_STYLE = {
+  positive: "bg-green-500/10 text-green-400",
+  negative: "bg-red-500/10 text-red-400",
+  neutral:  "bg-stone-500/10 text-stone-400",
 };
 
-type SortMode = "latest" | "popular";
+const SENTIMENT_LABEL = {
+  positive: "긍정",
+  negative: "부정",
+  neutral:  "중립",
+};
+
+type SortMode = "popular" | "latest";
 
 function CommentBody({ body }: { body: string }) {
   const [expanded, setExpanded] = useState(false);
@@ -29,11 +35,11 @@ function CommentBody({ body }: { body: string }) {
 
   return (
     <div>
-      <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-line">{displayText}</p>
+      <p className="text-sm text-stone-300 leading-relaxed whitespace-pre-line">{displayText}</p>
       {isLong && (
         <button
           onClick={() => setExpanded((v) => !v)}
-          className="text-xs text-indigo-400 hover:text-indigo-300 mt-1"
+          className="text-sm text-amber-500 hover:text-amber-400 mt-1"
         >
           {expanded ? "접기 ▲" : "더보기 ▼"}
         </button>
@@ -48,7 +54,7 @@ type Props = {
 
 export function CommentFeed({ commentData }: Props) {
   const [comments, setComments] = useState<Comment[]>([]);
-  const [sortMode, setSortMode] = useState<SortMode>("latest");
+  const [sortMode, setSortMode] = useState<SortMode>("popular");
 
   useEffect(() => {
     if (!commentData) return;
@@ -74,43 +80,55 @@ export function CommentFeed({ commentData }: Props) {
 
   if (comments.length === 0) {
     return (
-      <div className="flex items-center justify-center h-24 text-sm text-gray-500">
-        댓글 수신 대기 중...
+      <div className="flex flex-col items-center justify-center h-28 gap-2 text-stone-400">
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+        </svg>
+        <span className="text-sm">댓글 수신 대기 중...</span>
       </div>
     );
   }
 
   return (
     <div className="space-y-3">
-      <div className="flex gap-2">
-        {(["latest", "popular"] as SortMode[]).map((mode) => (
-          <button
-            key={mode}
-            onClick={() => setSortMode(mode)}
-            className={`text-xs px-3 py-1 rounded-full border transition-colors ${
-              sortMode === mode
-                ? "border-indigo-500 text-indigo-400 bg-indigo-500/10"
-                : "border-gray-700 text-gray-500 hover:text-gray-400"
-            }`}
-          >
-            {mode === "latest" ? "최신순" : "인기순"}
-          </button>
-        ))}
-        <span className="text-xs text-gray-600 ml-auto self-center">{comments.length}개</span>
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-stone-300">댓글 {comments.length}개</span>
+        <div className="flex gap-1">
+          {(["popular", "latest"] as SortMode[]).map((mode) => (
+            <button
+              key={mode}
+              onClick={() => setSortMode(mode)}
+              className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+                sortMode === mode
+                  ? "border-amber-500 text-amber-500 bg-amber-500/10"
+                  : "border-stone-700 text-stone-500 hover:text-stone-400"
+              }`}
+            >
+              {mode === "popular" ? "인기순" : "최신순"}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+      <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
         {sorted.map((c) => (
-          <div key={c.comment_id} className="rounded-lg border border-gray-800 bg-gray-950 p-3 space-y-1">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-indigo-400">{c.author}</span>
+          <div key={c.comment_id} className="rounded-lg border border-stone-800 bg-stone-950 p-3.5 space-y-2">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className={SENTIMENT_COLOR[c.sentiment]}>{c.sentiment}</span>
-                <span className="text-gray-600">↑ {c.score}</span>
+                <span className="text-sm font-medium text-stone-200">{c.author}</span>
+                <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${SENTIMENT_STYLE[c.sentiment]}`}>
+                  {SENTIMENT_LABEL[c.sentiment]}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 text-sm text-stone-300">
+                <svg className="w-3 h-3" viewBox="0 0 12 12" fill="currentColor">
+                  <path d="M6 1L7.5 4.5H11L8.25 6.75L9.25 10.5L6 8.25L2.75 10.5L3.75 6.75L1 4.5H4.5L6 1Z" />
+                </svg>
+                <span>{c.score.toLocaleString()}</span>
               </div>
             </div>
             <CommentBody body={c.body} />
-            <p className="text-xs text-gray-600">
+            <p className="text-sm text-stone-300">
               {new Date(c.created_at).toLocaleString("ko-KR")}
             </p>
           </div>

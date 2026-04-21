@@ -25,6 +25,9 @@ export const fetchIssues = (token?: string, q?: string, cursor?: string) => {
   return apiFetch<Issue[]>(`/issues${qs ? `?${qs}` : ""}`, token);
 };
 
+export const fetchIssue = (id: string, token?: string) =>
+  apiFetch<Issue>(`/issues/${id}`, token);
+
 export const fetchArchivedIssues = (token: string, q?: string) =>
   apiFetch<Issue[]>(`/issues/archived${q ? `?q=${encodeURIComponent(q)}` : ""}`, token);
 

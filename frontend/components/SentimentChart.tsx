@@ -33,40 +33,76 @@ export function SentimentChart({ sentimentData }: Props) {
 
   if (total === 0) {
     return (
-      <div className="flex items-center justify-center h-40 text-sm text-gray-500">
-        데이터 수신 대기 중...
+      <div className="flex flex-col items-center justify-center h-40 gap-2 text-stone-400">
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25z" />
+        </svg>
+        <span className="text-sm">데이터 수신 대기 중...</span>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center gap-6">
-      <ResponsiveContainer width={160} height={160}>
-        <PieChart>
-          <Pie data={counts} cx="50%" cy="50%" innerRadius={45} outerRadius={70} dataKey="value" strokeWidth={0}>
-            {counts.map((entry, i) => (
-              <Cell key={i} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip
-            contentStyle={{ background: "#111827", border: "1px solid #374151", borderRadius: 8 }}
-            itemStyle={{ color: "#d1d5db" }}
-          />
-        </PieChart>
-      </ResponsiveContainer>
+    <div className="flex items-center gap-8">
+      <div className="relative shrink-0">
+        <ResponsiveContainer width={140} height={140}>
+          <PieChart>
+            <Pie
+              data={counts}
+              cx="50%"
+              cy="50%"
+              innerRadius={42}
+              outerRadius={65}
+              dataKey="value"
+              strokeWidth={0}
+              paddingAngle={2}
+            >
+              {counts.map((entry, i) => (
+                <Cell key={i} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip
+              content={({ active, payload }) => {
+                if (!active || !payload?.length) return null;
+                const { name, value, color } = payload[0].payload as SentimentCount;
+                const pct = Math.round(((value as number) / total) * 100);
+                return (
+                  <div className="rounded-lg border border-stone-700 bg-stone-900 px-3 py-2 shadow-xl text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                      <span className="text-stone-200 font-medium">{name}</span>
+                    </div>
+                    <p className="mt-1 text-stone-400">{value as number}개 · {pct}%</p>
+                  </div>
+                );
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <span className="text-xl font-bold text-white">{total}</span>
+          <span className="text-sm text-stone-400">댓글</span>
+        </div>
+      </div>
 
-      <div className="space-y-2">
-        {counts.map((c) => (
-          <div key={c.name} className="flex items-center gap-2 text-sm">
-            <span className="w-2.5 h-2.5 rounded-full" style={{ background: c.color }} />
-            <span className="text-gray-400 w-8">{c.name}</span>
-            <span className="text-white font-medium">{c.value}</span>
-            <span className="text-gray-600 text-xs">
-              ({total > 0 ? Math.round((c.value / total) * 100) : 0}%)
-            </span>
-          </div>
-        ))}
-        <p className="text-xs text-gray-600 pt-1">총 {total}개 댓글 분석</p>
+      <div className="flex-1 space-y-3">
+        {counts.map((c) => {
+          const pct = total > 0 ? Math.round((c.value / total) * 100) : 0;
+          return (
+            <div key={c.name} className="space-y-1">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-stone-400 font-medium">{c.name}</span>
+                <span className="text-stone-300">{c.value}개 <span className="text-stone-400">({pct}%)</span></span>
+              </div>
+              <div className="h-1.5 rounded-full bg-stone-800 overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${pct}%`, background: c.color }}
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

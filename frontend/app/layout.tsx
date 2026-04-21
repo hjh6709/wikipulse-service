@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
+import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Providers from "@/components/Providers";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "WikiPulse",
@@ -10,8 +17,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko">
-      <body className="min-h-screen bg-gray-950 text-gray-100 antialiased">
+    <html lang="ko" className={playfair.variable}>
+      <body className="min-h-screen bg-stone-950 text-stone-100 antialiased">
         <Providers>
           <Header />
           {children}
