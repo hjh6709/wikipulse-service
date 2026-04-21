@@ -384,15 +384,110 @@ AWS의 CDN(Content Delivery Network) 서비스입니다. 사용자 가까운 엣
 
 ---
 
-## 16. 주차별 핵심 개념 요약
+## 16. structlog (JSON 로그)
+
+FastAPI 기본 로그는 텍스트 형태라 FluentBit(로그 수집기)가 파싱하기 어렵습니다. structlog는 JSON 형태로 로그를 출력해서 Loki 같은 로그 수집 시스템과 연동할 수 있습니다.
+
+```python
+# 기존 텍스트 로그
+INFO: GET /issues - 200
+
+# structlog JSON 로그
+{"event": "request", "method": "GET", "path": "/issues", "status": 200, "service": "wikipulse-api"}
+```
+
+> 조승연(SRE)의 FluentBit 파서 설정 확인 후 필드 구조 맞춰서 적용 (6주차)
+
+---
+
+## 17. Cursor 기반 페이지네이션
+
+이슈 목록처럼 실시간으로 데이터가 추가되는 경우, 일반 page 방식 (`?page=1&page=2`)은 문제가 생깁니다.
+
+```
+# page 방식 문제점
+1페이지 조회 (20개) → 새 이슈 1개 추가 → 2페이지 조회 시 이전 20번째 이슈가 다시 나옴 (중복)
+```
+
+cursor 방식은 "마지막으로 본 항목 다음부터" 가져옵니다.
+
+```
+GET /issues?cursor=issue-20&limit=20
+→ issue-20 이후 20개 반환 → 중복/누락 없음
+```
+
+> 히스토리 페이지, 이슈 리스트 무한 스크롤 구현 시 사용 (7주차)
+
+---
+
+## 18. Jest (프론트엔드 테스트)
+
+React 컴포넌트와 커스텀 훅을 테스트하는 JavaScript 테스트 프레임워크입니다. Python pytest의 프론트엔드 버전이라고 보면 됩니다.
+
+```typescript
+// IssueList 컴포넌트가 이슈 목록을 잘 렌더링하는지 검증
+test("이슈 목록 렌더링", () => {
+  render(<IssueList />)
+  expect(screen.getByText("Mock Wikipedia Issue 1")).toBeInTheDocument()
+})
+```
+
+> 8주차에 IssueList, useWebSocket 훅 테스트 작성 예정
+
+---
+
+## 19. k6 (부하 테스트)
+
+API가 동시에 많은 요청을 받았을 때 얼마나 버티는지 측정하는 도구입니다.
+
+```javascript
+// 100명이 동시에 GET /issues를 30초간 요청
+export const options = { vus: 100, duration: "30s" }
+export default function () {
+  http.get("http://localhost:8000/issues")
+}
+```
+
+결과로 평균 응답시간, 에러율, 초당 처리량(RPS)을 확인합니다.
+
+> 8주차 안정화 단계에서 사용
+
+---
+
+## 20. Dockerfile 멀티스테이지 빌드
+
+이미지 크기를 줄이기 위해 빌드 단계와 실행 단계를 분리합니다.
+
+```dockerfile
+# 빌드 단계 — poetry, 개발 도구 포함 (무거움)
+FROM python:3.11-slim AS builder
+RUN pip install poetry
+COPY pyproject.toml .
+RUN poetry export -f requirements.txt > requirements.txt
+
+# 실행 단계 — requirements.txt만 설치 (가벼움)
+FROM python:3.11-slim
+COPY --from=builder /app/requirements.txt .
+RUN pip install -r requirements.txt
+COPY app/ .
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0"]
+```
+
+poetry 자체가 이미지에 포함되지 않아서 최종 이미지가 훨씬 작아집니다.
+
+> 7주차 배포 최적화 시 적용
+
+---
+
+## 21. 주차별 핵심 개념 요약
 
 | 주차 | 핵심 개념 |
 |---|---|
 | 1주차 | FastAPI 구조, Next.js App Router, Docker Compose, Poetry |
 | 2주차 | JWT 인증, next-auth, Redis 캐시, 환경변수, Kong Gateway |
 | 3주차 | WebSocket, Kafka consume, Recharts 실시간 차트 |
-| 4주차 | AWS Lambda, E2E 흐름, AI 브리핑 카드 |
-| 5주차 | Kong 실제 연동, 이슈 상세 페이지, 유저 설정 API |
-| 6주차 | Keycloak SSO, Redis TTL 전략, API 응답 포맷 표준화 |
-| 7주차 | CloudFront 배포, Lambda 알림, 히스토리 검색 |
-| 8주차 | 테스트 (pytest, Jest, k6), 성능 최적화, 팀 데모 |
+| 4주차 | AWS Lambda, E2E 흐름, AI 브리핑 카드, pytest |
+| 5주차 | 유저 API, 이슈 검색, status 필드, Kafka 에러 처리 |
+| 6주차 | Keycloak SSO, Redis TTL 전략, structlog, 설정 페이지 API 연동 |
+| 7주차 | CloudFront 배포, Lambda 알림, 히스토리 검색, cursor 페이지네이션, Dockerfile 최적화 |
+| 8주차 | Jest 컴포넌트 테스트, k6 부하 테스트, Kafka 실데이터 연동, 팀 데모 |

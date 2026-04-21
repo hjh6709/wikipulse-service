@@ -19,6 +19,9 @@ def _load_mock(filename: str) -> list[dict] | dict:
     return json.loads(path.read_text()) if path.exists() else []
 
 
+_STATUSES = ["발생", "확산", "정점", "소강", "발생"]
+
+
 def _mock_issues() -> list[dict]:
     return [
         {
@@ -26,6 +29,7 @@ def _mock_issues() -> list[dict]:
             "title": f"Mock Wikipedia Issue {i}",
             "edit_count": 10 * i,
             "spike_score": round(0.5 + i * 0.1, 2),
+            "status": _STATUSES[i - 1],
             "updated_at": datetime.now(timezone.utc).isoformat(),
         }
         for i in range(1, 6)
@@ -33,12 +37,44 @@ def _mock_issues() -> list[dict]:
 
 
 @router.get("", response_model=list[Issue])
-async def get_issues(preview: bool = Query(False), _: dict | None = Depends(get_optional_user)):
+async def get_issues(
+    preview: bool = Query(False),
+    q: str | None = Query(None),
+    _: dict | None = Depends(get_optional_user),
+):
     cached = await get_issues_cached()
     data = cached or (_mock_issues() if settings.use_mock else [])
     if not cached:
         await set_issues_cached(data)
+    if q:
+        q_lower = q.lower()
+        data = [d for d in data if q_lower in d.get("title", "").lower()]
     return data[:3] if preview else data
+
+
+@router.get("/archived", response_model=list[Issue])
+async def get_archived_issues(
+    q: str | None = Query(None),
+    _: dict = Depends(get_current_user),
+):
+    """소강 상태 이슈 목록 — /history 페이지용"""
+    if settings.use_mock:
+        data = [
+            {
+                "issue_id": f"archived-{i}",
+                "title": f"Archived Wikipedia Issue {i}",
+                "edit_count": 5 * i,
+                "spike_score": round(0.2 + i * 0.05, 2),
+                "status": "소강",
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+            }
+            for i in range(1, 4)
+        ]
+        if q:
+            q_lower = q.lower()
+            data = [d for d in data if q_lower in d.get("title", "").lower()]
+        return data
+    return []
 
 
 @router.get("/{issue_id}/briefing", response_model=Briefing)

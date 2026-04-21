@@ -3,8 +3,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import alerts, issues, websocket
-from app.services.kafka_consumer import start_consumer
+from app.api import alerts, issues, users, websocket
+from app.services.kafka_consumer import is_kafka_healthy, start_consumer
 from app.services.redis_client import close_redis
 
 
@@ -27,9 +27,10 @@ app.add_middleware(
 
 app.include_router(issues.router)
 app.include_router(alerts.router)
+app.include_router(users.router)
 app.include_router(websocket.router)
 
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    return {"status": "ok", "kafka": "ok" if is_kafka_healthy() else "unavailable"}

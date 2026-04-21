@@ -6,7 +6,9 @@ import pytest
 async def test_health(client):
     r = await client.get("/health")
     assert r.status_code == 200
-    assert r.json() == {"status": "ok"}
+    data = r.json()
+    assert data["status"] == "ok"
+    assert "kafka" in data
 
 
 @pytest.mark.asyncio
@@ -23,12 +25,29 @@ async def test_get_issues_with_auth(client, auth_headers):
     assert r.status_code == 200
     data = r.json()
     assert isinstance(data, list)
-    assert len(data) == 5  # mock returns 5 issues
+    assert len(data) == 5
     issue = data[0]
     assert "issue_id" in issue
     assert "title" in issue
     assert "edit_count" in issue
     assert "spike_score" in issue
+    assert issue["status"] in ("발생", "확산", "정점", "소강")
+
+
+@pytest.mark.asyncio
+async def test_issue_search(client, auth_headers):
+    r = await client.get("/issues?q=Issue+1", headers=auth_headers)
+    assert r.status_code == 200
+    data = r.json()
+    assert len(data) == 1
+    assert "1" in data[0]["title"]
+
+
+@pytest.mark.asyncio
+async def test_issue_search_no_match(client, auth_headers):
+    r = await client.get("/issues?q=존재하지않는키워드", headers=auth_headers)
+    assert r.status_code == 200
+    assert r.json() == []
 
 
 @pytest.mark.asyncio
@@ -46,6 +65,28 @@ async def test_get_issues_preview_with_auth(client, auth_headers):
     r = await client.get("/issues?preview=true", headers=auth_headers)
     assert r.status_code == 200
     assert len(r.json()) == 3
+
+
+@pytest.mark.asyncio
+async def test_get_archived_issues(client, auth_headers):
+    r = await client.get("/issues/archived", headers=auth_headers)
+    assert r.status_code == 200
+    data = r.json()
+    assert len(data) == 3
+    assert all(d["status"] == "소강" for d in data)
+
+
+@pytest.mark.asyncio
+async def test_get_archived_issues_search(client, auth_headers):
+    r = await client.get("/issues/archived?q=Issue+1", headers=auth_headers)
+    assert r.status_code == 200
+    assert len(r.json()) == 1
+
+
+@pytest.mark.asyncio
+async def test_get_archived_requires_auth(client):
+    r = await client.get("/issues/archived")
+    assert r.status_code == 401
 
 
 @pytest.mark.asyncio

@@ -28,12 +28,13 @@ WS   /ws/issues
 ## Now (Week 5)
 - [ ] Kong Gateway integration (김용균 ArgoCD template)
 - [ ] WebSocket auth method finalize (윤승호 confirm)
-- [ ] Kafka consume failure error handling
-- [ ] GET /users/me, PATCH /users/me
-- [ ] Bookmark API (GET/POST/DELETE /users/bookmarks)
-- [ ] Preferences API (GET/POST /users/preferences)
-- [ ] Issue search (GET /issues?q=keyword)
-- [ ] Issue status field (발생/확산/정점/소강)
+- [x] Kafka consume failure error handling (재시도 3회 + _kafka_healthy 플래그 + /health 노출)
+- [x] GET /users/me, PATCH /users/me
+- [x] Bookmark API (GET/POST/DELETE /users/bookmarks)
+- [x] Preferences API (GET/POST /users/preferences)
+- [x] Issue search (GET /issues?q=keyword)
+- [x] Issue status field (발생/확산/정점/소강)
+- [x] Archive issues API (GET /issues/archived)
 
 ## Done (Week 4)
 - [x] Reddit comment feed (truncate + sort toggle)

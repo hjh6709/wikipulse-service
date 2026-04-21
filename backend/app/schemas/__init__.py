@@ -8,6 +8,7 @@ class Issue(BaseModel):
     title: str
     edit_count: int
     spike_score: float
+    status: Literal["발생", "확산", "정점", "소강"] = "발생"
     updated_at: datetime
 
 
@@ -35,3 +36,24 @@ class AlertSettings(BaseModel):
 class WSMessage(BaseModel):
     type: Literal["sentiment", "briefing", "spike", "comment"]
     data: dict
+
+
+class UserSettings(BaseModel):
+    user_id: str
+    username: str
+    email: str
+
+
+class UserSettingsPatch(BaseModel):
+    username: str | None = None
+    email: str | None = None
+
+
+class Bookmark(BaseModel):
+    bookmark_id: str
+    issue_id: str
+    created_at: datetime
+
+
+class UserPreferences(BaseModel):
+    categories: list[str]

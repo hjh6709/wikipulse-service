@@ -95,7 +95,7 @@ wikipulse-service/
 - [x] FastAPI 프로젝트 생성 (Poetry)
 - [x] Next.js 14 프로젝트 생성 (TypeScript, App Router)
 - [x] Docker Compose 로컬 개발환경 (FastAPI + Next.js + Redis)
-- [x] OpenAPI 스키마 초안 (/docs Swagger 자동 생성)
+- [x] Swagger UI 자동 생성 (`/docs`)
 - [x] Keycloak OIDC next-auth 코드 설정 (로컬 서버는 Week 2에)
 - [x] 로그인 페이지 UI 와이어프레임
 
@@ -109,7 +109,7 @@ wikipulse-service/
 - [x] 로컬 mock Credentials 로그인 (Keycloak 없이 동작)
 - [x] `GET /issues` Redis 캐시 + 미연결 fallback
 - [x] 세션 토큰 → API 호출 연동
-- [x] 트렌딩 이슈 리스트 컴포넌트
+- [x] 트렌딩 이슈 리스트 컴포넌트 (status 뱃지 + 검색바 포함)
 - [x] 미로그인 시 /login redirect
 - [-] Kong Gateway 라우팅 설정 → 로컬은 env var 우회 유지, 김용균 확인 후 진행
 
@@ -121,70 +121,79 @@ wikipulse-service/
 
 ### 3주차 — WebSocket + 실시간 차트 ✅
 - [x] `WS /ws/issues` WebSocket 서버 구현
-- [x] Kafka `sentiment-results` consume → WebSocket broadcast
+- [x] Kafka `sentiment-results`, `briefings`, `alerts`, `reddit-comments` consume → WebSocket broadcast
 - [x] `useWebSocket` 커스텀 훅 구현 (자동 재연결 포함)
 - [x] 편집 스파이크 그래프 (Recharts)
 - [x] 감성 분포 차트 (실시간)
 - [x] mock 데이터로 E2E 테스트
 
-> 비고: `_MOCK_DIR = Path(__file__).parents[4]` → `parents[3]` 수정 (경로 오류로 mock 데이터 미전송), `authOptions` → `lib/auth.ts` 분리 (Next.js route 파일 타입 충돌), Session 타입에 `accessToken` 추가
+> 비고: `_MOCK_DIR = Path(__file__).parents[4]` → `parents[3]` 수정, `authOptions` → `lib/auth.ts` 분리, Session 타입에 `accessToken` 추가, WS 잘못된 토큰 시 1008 close 처리
 
 ✅ **완료 기준**: mock 데이터로 스파이크 그래프·감성 차트 실시간 업데이트 확인 ✅
 
 ---
 
-### 4주차 — Reddit 피드 + 타임라인 + Month 1 마일스톤 (진행 중)
+### 4주차 — Reddit 피드 + 타임라인 + Month 1 마일스톤 ✅
 - [x] Kafka `briefings` consume → WebSocket broadcast
 - [x] `GET /issues/{id}/briefing` 구현 (mock 데이터 반환)
 - [x] `POST /settings/alerts` + Lambda 트리거 연동
-- [x] Reddit 댓글 피드 컴포넌트 (3줄 truncate + 더보기, WebSocket comment 타입)
+- [x] Reddit 댓글 피드 컴포넌트 (3줄 truncate + 더보기, 최신순/인기순 정렬)
 - [x] 이슈 타임라인 컴포넌트 (REST API 초기 로드)
 - [x] AI 브리핑 카드 프로토타입
 - [x] 랜딩 페이지 (비로그인 이슈 미리보기 3개, `GET /issues?preview=true`)
-- [x] E2E 시나리오 테스트 (pytest 12개 통과 — REST API + WebSocket mock)
+- [x] 이슈 상세 페이지 (`/issues/[id]`) — WebSocket 실시간 연동
+- [x] E2E pytest 22개 통과 (REST API + WebSocket + 유저 API)
 - [ ] 팀 데모
 
-> 비고: `reddit-comments` Kafka 토픽 추가 확인 (김찬영), Kong 비로그인 예외 설정 필요 (윤승호), WS 잘못된 토큰 시 1008 close 처리 추가
+> 비고: `reddit-comments` Kafka 토픽 추가 확인 (김찬영), Kong 비로그인 예외 설정 필요 (윤승호)
 
 ✅ **Month 1 마일스톤**: 편집 폭증 이벤트 → 대시보드 실시간 반영 E2E 흐름 동작
 
 ---
 
-### 5주차 — Kong 연동 + WebSocket 인증 + 에러 처리 고도화
+### 5주차 — 유저 API + 에러 처리 + 검색 (진행 중)
 - [ ] Kong Gateway 실제 연동 (김용균 ArgoCD 템플릿 기준)
 - [ ] WebSocket 인증 방식 확정 (윤승호 확인 후 Kong 플러그인 or FastAPI 직접 유지)
-- [ ] Kafka consume 실패 케이스 에러 처리 (재시도 3회 후 "데이터 로딩 중" 배너)
+- [x] Kafka consume 실패 에러 처리 (재시도 3회 + `_kafka_healthy` 플래그 + `/health` 노출)
 - [ ] Redis 장애 fallback 고도화
-- [ ] `GET /issues/{id}/sentiment` 실제 데이터 연동 (뼈대 → Kafka consume 결과 반환)
-- [ ] `GET /issues/{id}/timeline` 실제 데이터 연동 (뼈대 → 타임라인 이벤트 반환)
-- [ ] 이슈 상세 페이지 (`/issues/[id]`) 구현
-- [ ] 유저 설정 API (`GET /users/me`, `PATCH /users/me`)
-- [ ] 북마크 API (`GET /users/bookmarks`, `POST /users/bookmarks`, `DELETE /users/bookmarks/{id}`)
-- [ ] 관심 카테고리 API (`GET /users/preferences`, `POST /users/preferences`)
-- [ ] 이슈 검색 API (`GET /issues?q=keyword`)
-- [ ] 아카이브 이슈 API (`GET /issues/archived`)
-- [ ] Issue 스키마에 `status` 필드 추가 (발생/확산/정점/소강)
+- [ ] Kafka 장애 시 프론트 "데이터 로딩 중" 배너
+- [x] 유저 설정 API (`GET /users/me`, `PATCH /users/me`)
+- [x] 북마크 API (`GET /users/bookmarks`, `POST /users/bookmarks`, `DELETE /users/bookmarks/{id}`)
+- [x] 관심 카테고리 API (`GET /users/preferences`, `POST /users/preferences`)
+- [x] 이슈 검색 API (`GET /issues?q=keyword`) + 프론트 검색바 연동
+- [x] 아카이브 이슈 API (`GET /issues/archived`)
+- [x] Issue 스키마에 `status` 필드 추가 + 프론트 뱃지 표시
+- [ ] 설정 페이지 API 연동 (`/settings/bookmarks`, `/settings/preferences`, `/settings/account`)
 
 ✅ **완료 기준**: Kong 통해서 API 호출 성공 + 에러 상황에서 UI가 멈추지 않음
 
 ---
 
-### 6주차 — Keycloak SSO + 실시간 대시보드 완성
+### 6주차 — Keycloak SSO + 설정 페이지 완성
 - [ ] Keycloak 실제 서버 연동 (윤승호 realm/client 설정 기준)
 - [ ] next-auth CredentialsProvider → KeycloakProvider 교체
-- [ ] AI 브리핑 카드 완성 (WebSocket 실시간)
-- [ ] 토픽 클러스터 시각화 컴포넌트
+- [ ] `/onboarding` 페이지 구현 (첫 로그인 시 관심 카테고리 선택)
+- [ ] `/settings/account` API 연동 (`GET/PATCH /users/me`)
+- [ ] `/settings/bookmarks` API 연동 (`GET/DELETE /users/bookmarks`)
+- [ ] `/settings/preferences` API 연동 (`GET/POST /users/preferences`)
+- [ ] `/settings/alerts` 알림 설정 폼 완성 (`POST /settings/alerts`)
+- [ ] 네비게이션/헤더 컴포넌트 (로그인 상태, 메뉴 링크)
 - [ ] Redis TTL 전략 조정 (alerts 이벤트 시 캐시 무효화 추가)
+- [ ] AI 브리핑 카드 완성 (WebSocket 실시간)
 - [ ] API 응답 포맷 표준화 적용 (`{ status, data }` 구조)
 - [ ] JSON 로그 포맷 적용 (structlog, 조승연 FluentBit 파서 기준)
 
-✅ **완료 기준**: Keycloak 로그인 → 실시간 브리핑·클러스터 대시보드 동작
+✅ **완료 기준**: Keycloak 로그인 → 설정 페이지 실제 저장/조회 동작
 
 ---
 
-### 7주차 — Lambda 알림 + CloudFront 배포 + 히스토리 검색
+### 7주차 — Lambda 알림 + CloudFront 배포 + 히스토리
 - [ ] Lambda Discord/이메일 알림 완성 (EventBridge 트리거)
-- [ ] 히스토리 검색 컴포넌트 + `GET /issues` 페이지네이션 추가
+- [ ] `/history` 페이지 구현 (`GET /issues/archived` 연동, 키워드 검색)
+- [ ] `GET /issues` 페이지네이션 추가 (cursor 기반)
+- [ ] 404 페이지 구현
+- [ ] 로딩 스켈레톤 UI (이슈 리스트, 이슈 상세)
+- [ ] 토픽 클러스터 시각화 컴포넌트
 - [ ] CloudFront 배포 방식 확정 (김용균과 옵션 A/B 결정 후 적용)
 - [ ] k8s/ 폴더 Deployment·Service yaml 추가 (인프라팀 템플릿 기준)
 - [ ] 환경별 설정 분리 (.env.local / .env.production)
@@ -195,11 +204,11 @@ wikipulse-service/
 ---
 
 ### 8주차 — 테스트 + 안정화 + Month 2 마일스톤
-- [ ] pytest 테스트 코드 작성 (test_issues.py, test_websocket.py)
+- [ ] Kafka 실제 스키마 연동 (김찬영·양성호 확정 후 mock → 실데이터 교체)
 - [ ] Jest 컴포넌트 테스트 (IssueList, useWebSocket)
 - [ ] k6 API 부하 테스트
 - [ ] 상태 관리 성능 검토 (Context 유지 or Zustand 전환)
-- [ ] 전체 E2E 시나리오 테스트
+- [ ] 전체 E2E 시나리오 테스트 (로그인 → 이슈 상세 → 알림 설정 흐름)
 - [ ] UI 폴리싱 (Lighthouse 성능 점수 확인)
 - [ ] 팀 데모 준비
 
