@@ -7,6 +7,7 @@ import { CommentFeed } from "@/components/CommentFeed";
 import { IssueTimeline } from "@/components/IssueTimeline";
 import { SentimentChart } from "@/components/SentimentChart";
 import { SpikeChart } from "@/components/SpikeChart";
+import { SystemBanner } from "@/components/SystemBanner";
 import { useWebSocket } from "@/hooks/useWebSocket";
 
 type Briefing = { summary: string; key_points: string[]; created_at: string };
@@ -55,10 +56,22 @@ export default function IssuePage({ params }: { params: { id: string } }) {
     }
   }, [lastMessage]);
 
-  if (status === "loading") return null;
+  if (status === "loading") return (
+    <main className="max-w-3xl mx-auto px-4 py-8 space-y-6 animate-pulse">
+      <div className="h-7 w-40 rounded bg-gray-800" />
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="rounded-xl border border-gray-800 bg-gray-900 p-5 space-y-3">
+          <div className="h-4 w-24 rounded bg-gray-700" />
+          <div className="h-3 w-full rounded bg-gray-700" />
+          <div className="h-3 w-3/4 rounded bg-gray-700" />
+        </div>
+      ))}
+    </main>
+  );
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+      <SystemBanner />
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">이슈 #{params.id}</h1>
         <span className={`text-xs px-2 py-1 rounded-full ${connected ? "bg-green-900 text-green-400" : "bg-gray-800 text-gray-500"}`}>

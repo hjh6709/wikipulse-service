@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import IssueList from "@/components/IssueList";
+
+export const metadata: Metadata = { title: "트렌딩 이슈 — WikiPulse" };
 
 export default async function IssuesPage() {
   const session = await getServerSession(authOptions);

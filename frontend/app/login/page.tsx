@@ -7,11 +7,15 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleMockLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    await signIn("credentials", { username, password, callbackUrl: "/issues" });
+    setError("");
+    const res = await signIn("credentials", { username, password, callbackUrl: "/issues", redirect: false });
+    if (res?.error) setError("로그인에 실패했습니다. 다시 시도해주세요.");
+    else if (res?.url) window.location.href = res.url;
     setLoading(false);
   }
 
@@ -44,6 +48,11 @@ export default function LoginPage() {
               className="w-full rounded-lg bg-gray-800 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600"
             />
           </div>
+          {error && (
+            <p className="rounded-lg bg-red-500/10 border border-red-500/20 px-3 py-2 text-sm text-red-400">
+              {error}
+            </p>
+          )}
           <button
             type="submit"
             disabled={loading || !username}

@@ -1,4 +1,8 @@
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
 
 type Issue = {
   issue_id: string;
@@ -21,7 +25,8 @@ async function getPreviewIssues(): Promise<Issue[]> {
 }
 
 export default async function Home() {
-  const issues = await getPreviewIssues();
+  const [issues, session] = await Promise.all([getPreviewIssues(), getServerSession(authOptions)]);
+  const isLoggedIn = !!session;
 
   return (
     <main className="min-h-screen bg-gray-950 text-white">
@@ -35,10 +40,10 @@ export default async function Home() {
           </p>
           <div className="flex items-center justify-center gap-3 pt-2">
             <Link
-              href="/login"
+              href={isLoggedIn ? "/issues" : "/login"}
               className="rounded-lg bg-indigo-600 px-6 py-3 font-semibold hover:bg-indigo-500 transition-colors"
             >
-              시작하기
+              {isLoggedIn ? "이슈 피드 보기" : "시작하기"}
             </Link>
           </div>
         </section>
@@ -46,7 +51,7 @@ export default async function Home() {
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-gray-400">지금 주목받는 이슈</h2>
-            <Link href="/login" className="text-xs text-indigo-400 hover:text-indigo-300">
+            <Link href={isLoggedIn ? "/issues" : "/login"} className="text-xs text-indigo-400 hover:text-indigo-300">
               전체 보기 →
             </Link>
           </div>
@@ -71,7 +76,7 @@ export default async function Home() {
                       스파이크 {Math.round(issue.spike_score * 100)}%
                     </p>
                     <Link
-                      href="/login"
+                      href={isLoggedIn ? `/issues/${issue.issue_id}` : "/login"}
                       className="text-xs text-gray-600 hover:text-gray-400"
                     >
                       자세히 보기 →
@@ -83,7 +88,7 @@ export default async function Home() {
           )}
 
           <p className="text-center text-xs text-gray-600 pt-2">
-            전체 이슈 및 실시간 분석은 로그인 후 이용 가능합니다
+            {isLoggedIn ? "" : "전체 이슈 및 실시간 분석은 로그인 후 이용 가능합니다"}
           </p>
         </section>
 
