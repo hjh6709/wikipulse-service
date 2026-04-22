@@ -208,12 +208,20 @@ wikipulse-service/
 - [ ] k6 API 부하 테스트
 - [ ] 상태 관리 성능 검토 (Context 유지 or Zustand 전환)
 - [ ] 전체 E2E 시나리오 테스트 (로그인 → 이슈 상세 → 알림 설정 흐름)
-- [x] UI 폴리싱 — stone 테마 + amber 액센트 + Playfair Display 서체 전체 적용
+- [x] UI 폴리싱 — Deep Navy + Royal Blue 테마 전면 적용 (Tailwind custom colors: navy, surface, blue-glow shadows)
+- [x] 상태 컬러 시스템 — 발생(sky-400) / 확산(blue-500) / 정점(orange-400) / 소강(slate-500) + 네온 dot glow
+- [x] Sparkline — issue_id 시드 기반 결정론적 SVG 미니 그래프, 모든 이슈 카드 우측 표시
+- [x] Live Indicator — WikiPulse 로고 옆 animate-ping 레드 점(#FF4848), Trend 탭바 우측 블루 점
+- [x] 이슈 상세 페이지 2단 그리드 — max-w-5xl, lg:grid-cols-[1.2fr_1fr], 좌(Spike+Timeline)/우(Sentiment+Comments)
+- [x] BriefingCard — 숫자·단위 자동 Royal Blue 하이라이팅, AI sparkle 아이콘, glow 강화 border
+- [x] IssueTimeline — 그라데이션 커넥팅 라인, 타입별 glow 노드, stroke-only 미니멀 아이콘
+- [x] SystemBanner — 다크 앰버 배경(#1A1502) + 머스타드 옐로우(amber-400) Warning 배너
+- [x] SentimentChart — 도넛 중앙 숫자 대형화(text-3xl) + Total 라벨
+- [x] CommentFeed — 슬림 Royal Blue 커스텀 스크롤바
 - [x] Archive 페이지 개편 — 월별 그룹핑, 기간 필터(3개월/6개월/1년), 그룹별 더보기, 정렬(최신순/편집 많은순)
 - [x] Trend 이슈 피드 개편 — 상태별 좌측 컬러 보더, 상대 시간, 검색 아이콘 통합
 - [x] 홈 페이지 개편 — 미니멀 랜딩, 이슈 미리보기 카드 클릭 전체 링크
 - [x] 네비게이션 개편 — 페이지명 영문화(Trend/Archive), 설정 톱니바퀴 아이콘
-- [x] 접근성 개선 — 소형 텍스트·저대비 색상 전면 개선
 - [x] GET /issues/{id} — archived 이슈 ID 조회 지원 추가
 - [x] mock 아카이브 데이터 10건으로 확장, 월별 분산 배치
 - [ ] 라이트/다크 테마 전환 (next-themes + dark: 변형 — 실데이터 연동 후 진행)

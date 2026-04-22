@@ -43,8 +43,8 @@ export default function PreferencesPage() {
     <div className="space-y-6">
       <h2 className="text-lg font-semibold">개인화</h2>
 
-      <div className="rounded-xl border border-stone-800 bg-stone-900 p-6 space-y-4">
-        <p className="text-sm text-stone-400">관심 카테고리</p>
+      <div className="rounded-xl border border-slate-800 bg-surface p-6 space-y-4">
+        <p className="text-sm text-slate-400">관심 카테고리</p>
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((cat) => (
             <button
@@ -52,8 +52,8 @@ export default function PreferencesPage() {
               onClick={() => toggle(cat)}
               className={`rounded-full border px-3 py-1 text-sm transition-colors ${
                 selected.includes(cat)
-                  ? "border-amber-500 bg-amber-500/10 text-amber-500"
-                  : "border-stone-700 text-stone-400 hover:border-stone-600"
+                  ? "border-blue-500 bg-blue-500/10 text-blue-400"
+                  : "border-slate-700 text-slate-400 hover:border-slate-600"
               }`}
             >
               {cat}
@@ -64,7 +64,7 @@ export default function PreferencesPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium hover:bg-amber-500 disabled:opacity-50 transition-colors"
+            className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium hover:bg-blue-500 disabled:opacity-50 transition-colors"
           >
             {saving ? "저장 중..." : "저장"}
           </button>
@@ -72,8 +72,8 @@ export default function PreferencesPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-stone-800 bg-stone-900 p-6">
-        <p className="text-sm text-stone-400">구독 토픽 관리 — 준비 중</p>
+      <div className="rounded-xl border border-slate-800 bg-surface p-6">
+        <p className="text-sm text-slate-400">구독 토픽 관리 — 준비 중</p>
       </div>
     </div>
   );

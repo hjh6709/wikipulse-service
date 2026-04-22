@@ -14,7 +14,7 @@ export default async function IssuesPage() {
     <main className="mx-auto max-w-2xl p-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold font-display">Trend</h1>
-        <span className="text-sm text-stone-400">{(session.user?.name ?? "")}</span>
+        <span className="text-sm text-slate-400">{(session.user?.name ?? "")}</span>
       </div>
       <IssueList />
     </main>

@@ -24,8 +24,8 @@ export default function SettingsNav() {
                 href={item.href}
                 className={`block border-l-2 px-3 py-2 text-sm transition-colors ${
                   active
-                    ? "border-amber-500 text-white font-medium"
-                    : "border-transparent text-stone-400 hover:text-white hover:border-stone-600"
+                    ? "border-blue-500 text-white font-medium"
+                    : "border-transparent text-slate-400 hover:text-white hover:border-slate-600"
                 }`}
               >
                 {item.label}

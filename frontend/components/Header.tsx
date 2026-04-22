@@ -13,7 +13,7 @@ export default function Header() {
   if (HIDDEN_PATHS.includes(pathname)) return null;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-stone-800 bg-stone-950/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-slate-800 bg-navy/95 backdrop-blur">
       <div className="mx-auto max-w-5xl px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="font-bold text-white tracking-tight font-display text-lg">
@@ -31,7 +31,7 @@ export default function Header() {
                     key={href}
                     href={href}
                     className={`text-sm transition-colors ${
-                      active ? "text-white font-medium" : "text-stone-400 hover:text-white"
+                      active ? "text-white font-medium" : "text-slate-400 hover:text-white"
                     }`}
                   >
                     {label}
@@ -41,7 +41,7 @@ export default function Header() {
               <Link
                 href="/settings/account"
                 className={`transition-colors ${
-                  pathname.startsWith("/settings") ? "text-white" : "text-stone-400 hover:text-white"
+                  pathname.startsWith("/settings") ? "text-white" : "text-slate-400 hover:text-white"
                 }`}
                 aria-label="설정"
               >
@@ -57,12 +57,12 @@ export default function Header() {
         <div className="flex items-center gap-3">
           {status === "authenticated" ? (
             <>
-              <span className="text-sm text-stone-300">
+              <span className="text-sm text-slate-300">
                 {(session as { user?: { name?: string } } | null)?.user?.name ?? ""}
               </span>
               <button
                 onClick={() => signOut({ callbackUrl: "/login" })}
-                className="text-sm text-stone-400 hover:text-white transition-colors"
+                className="text-sm text-slate-400 hover:text-white transition-colors"
               >
                 로그아웃
               </button>
@@ -70,7 +70,7 @@ export default function Header() {
           ) : status === "unauthenticated" ? (
             <Link
               href="/login"
-              className="text-sm text-stone-400 hover:text-white transition-colors"
+              className="text-sm text-slate-400 hover:text-white transition-colors"
             >
               로그인
             </Link>

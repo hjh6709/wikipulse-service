@@ -30,21 +30,21 @@ export default function BookmarksPage() {
     <div className="space-y-6">
       <h2 className="text-lg font-semibold">북마크</h2>
 
-      <div className="rounded-xl border border-stone-800 bg-stone-900 p-6 space-y-3">
-        {loading && <p className="text-sm text-stone-400">로딩 중...</p>}
+      <div className="rounded-xl border border-slate-800 bg-surface p-6 space-y-3">
+        {loading && <p className="text-sm text-slate-400">로딩 중...</p>}
         {!loading && bookmarks.length === 0 && (
-          <p className="text-sm text-stone-400">북마크한 이슈가 없습니다.</p>
+          <p className="text-sm text-slate-400">북마크한 이슈가 없습니다.</p>
         )}
         {bookmarks.map((b) => (
           <div key={b.bookmark_id} className="flex items-center justify-between">
             <Link
               href={`/issues/${b.issue_id}`}
-              className="text-sm text-amber-500 hover:text-amber-400"
+              className="text-sm text-blue-400 hover:text-blue-400"
             >
               {b.issue_id}
             </Link>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-stone-300">
+              <span className="text-sm text-slate-300">
                 {new Date(b.created_at).toLocaleDateString("ko-KR")}
               </span>
               <button

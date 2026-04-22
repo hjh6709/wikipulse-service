@@ -35,7 +35,7 @@ export function SpikeChart({ spikeData }: Props) {
 
   if (points.length === 0) {
     return (
-      <div className="flex items-center justify-center h-40 text-sm text-stone-400">
+      <div className="flex items-center justify-center h-40 text-sm text-slate-400">
         데이터 수신 대기 중...
       </div>
     );
@@ -46,22 +46,22 @@ export function SpikeChart({ spikeData }: Props) {
       <AreaChart data={points} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
         <defs>
           <linearGradient id="spikeGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-            <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+            <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-        <XAxis dataKey="time" tick={{ fontSize: 11, fill: "#6b7280" }} />
-        <YAxis tick={{ fontSize: 11, fill: "#6b7280" }} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#1e2736" />
+        <XAxis dataKey="time" tick={{ fontSize: 11, fill: "#64748b" }} />
+        <YAxis tick={{ fontSize: 11, fill: "#64748b" }} />
         <Tooltip
-          contentStyle={{ background: "#111827", border: "1px solid #374151", borderRadius: 8 }}
-          labelStyle={{ color: "#9ca3af" }}
-          itemStyle={{ color: "#a5b4fc" }}
+          contentStyle={{ background: "#161B22", border: "1px solid rgba(59,130,246,0.2)", borderRadius: 8 }}
+          labelStyle={{ color: "#94a3b8" }}
+          itemStyle={{ color: "#93c5fd" }}
         />
         <Area
           type="monotone"
           dataKey="edit_count"
-          stroke="#6366f1"
+          stroke="#3B82F6"
           strokeWidth={2}
           fill="url(#spikeGradient)"
           name="편집 횟수"

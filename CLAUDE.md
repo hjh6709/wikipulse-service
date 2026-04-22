@@ -45,11 +45,11 @@ WS     /ws/issues
 - [ ] Kafka real schema integration (mock → 실데이터, 김찬영·양성호 확정 후)
 
 ## UI / Design
-- Theme: stone palette (warm dark) + amber accent + sky for "발생" status
-- Font: Playfair Display (serif) via next/font — applied to WikiPulse logo + page h1 headings
+- Theme: Deep Navy (#0B0E14) bg + Surface (#161B22) cards + Royal Blue (#3B82F6) accent
+- Font: Playfair Display (serif) via next/font — WikiPulse logo + page h1 headings
+- Status colors: 발생 sky-400 / 확산 blue-500 / 정점 orange-400 / 소강 slate-500
 - Page names: "Trend" (이슈 피드), "Archive" (이슈 히스토리)
-- Issue cards: colored left border by status, relative time display
-- Archive page: month grouping + period filter (3m/6m/1y) + sort (latest/edits) + per-group 더보기
+- Issue detail: 2-column grid on desktop (lg), single column on mobile
 - Light/dark theme toggle deferred — implement after real data integration
 
 ## Notes

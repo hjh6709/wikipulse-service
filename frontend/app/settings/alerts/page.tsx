@@ -80,9 +80,9 @@ export default function AlertsPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="rounded-xl border border-stone-800 bg-stone-900 p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="rounded-xl border border-slate-800 bg-surface p-6 space-y-6">
         <div className="space-y-3">
-          <label className="text-sm font-medium text-stone-300">편집 횟수 기준</label>
+          <label className="text-sm font-medium text-slate-300">편집 횟수 기준</label>
           <div className="flex gap-2">
             {[10, 20, 50, 100].map((preset) => (
               <button
@@ -91,19 +91,19 @@ export default function AlertsPage() {
                 onClick={() => setThreshold(preset)}
                 className={`px-3 py-1.5 rounded-lg border text-sm transition-colors ${
                   threshold === preset
-                    ? "border-amber-500 bg-amber-500/10 text-amber-500 font-medium"
-                    : "border-stone-700 text-stone-500 hover:border-stone-600 hover:text-stone-300"
+                    ? "border-blue-500 bg-blue-500/10 text-blue-400 font-medium"
+                    : "border-slate-700 text-slate-500 hover:border-slate-600 hover:text-slate-300"
                 }`}
               >
                 {preset}회
               </button>
             ))}
           </div>
-          <p className="text-sm text-stone-300">선택한 횟수를 넘어서면 즉시 알림을 보냅니다.</p>
+          <p className="text-sm text-slate-300">선택한 횟수를 넘어서면 즉시 알림을 보냅니다.</p>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-stone-300">알림 채널</label>
+          <label className="text-sm font-medium text-slate-300">알림 채널</label>
           <div className="flex gap-2">
             {CHANNELS.map((ch) => (
               <button
@@ -112,8 +112,8 @@ export default function AlertsPage() {
                 onClick={() => toggleChannel(ch.id)}
                 className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors ${
                   channels.includes(ch.id)
-                    ? "border-amber-500 bg-amber-500/10 text-amber-500"
-                    : "border-stone-700 text-stone-400 hover:border-stone-600"
+                    ? "border-blue-500 bg-blue-500/10 text-blue-400"
+                    : "border-slate-700 text-slate-400 hover:border-slate-600"
                 }`}
               >
                 {CHANNEL_ICONS[ch.id]}
@@ -126,7 +126,7 @@ export default function AlertsPage() {
         <button
           type="submit"
           disabled={saving}
-          className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium hover:bg-amber-500 disabled:opacity-50 transition-colors"
+          className="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium hover:bg-blue-500 disabled:opacity-50 transition-colors"
         >
           {saving ? "저장 중..." : "알림 등록"}
         </button>

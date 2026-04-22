@@ -47,23 +47,46 @@ function groupByMonth(issues: Issue[]): { label: string; key: string; items: Iss
     });
 }
 
+function Sparkline({ issueId, editCount }: { issueId: string; editCount: number }) {
+  let h = 0;
+  for (const c of issueId) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+  const pts: number[] = [];
+  let v = Math.max(1, editCount * 0.3);
+  for (let i = 0; i < 6; i++) {
+    h = (h * 1103515245 + 12345) & 0x7fff;
+    v = Math.max(1, v + (h / 0x7fff - 0.45) * editCount * 0.4);
+    pts.push(v);
+  }
+  pts.push(editCount);
+  const max = Math.max(...pts), min = Math.min(...pts);
+  const range = max - min || 1;
+  const W = 48, H = 18;
+  const pathD = pts
+    .map((val, i) => `${i === 0 ? "M" : "L"}${(i / (pts.length - 1)) * W},${H - ((val - min) / range) * (H - 2) - 1}`)
+    .join(" ");
+  return (
+    <svg width={W} height={H} className="shrink-0 opacity-50">
+      <path d={pathD} fill="none" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function HistorySkeletons() {
   return (
     <div className="space-y-6">
       {[...Array(2)].map((_, g) => (
         <div key={g} className="space-y-2">
-          <div className="h-5 w-28 rounded bg-stone-800 animate-pulse" />
+          <div className="h-5 w-28 rounded bg-slate-800 animate-pulse" />
           <ul className="space-y-2">
             {[...Array(3)].map((_, i) => (
-              <li key={i} className="rounded-xl border border-stone-800 bg-stone-900 p-4 animate-pulse">
-                <div className="flex items-center justify-between gap-4">
+              <li key={i} className="rounded-xl bg-surface ring-1 ring-blue-500/10 border-l-2 border-l-blue-500/20 px-4 py-4 animate-pulse">
+                <div className="flex items-center gap-4">
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 w-2/3 rounded bg-stone-700" />
-                    <div className="h-3 w-1/3 rounded bg-stone-800" />
+                    <div className="h-4 w-2/3 rounded bg-slate-700" />
+                    <div className="h-3 w-1/3 rounded bg-slate-800" />
                   </div>
-                  <div className="shrink-0 space-y-2 text-right">
-                    <div className="h-3 w-20 rounded bg-stone-800" />
-                  </div>
+                  <div className="h-5 w-12 rounded bg-slate-800 opacity-50" />
+                  <div className="h-3 w-16 rounded bg-slate-800" />
                 </div>
               </li>
             ))}
@@ -78,28 +101,31 @@ function IssueCard({ issue }: { issue: Issue }) {
   return (
     <Link
       href={`/issues/${issue.issue_id}`}
-      className="group flex items-center gap-4 rounded-xl border border-stone-800 bg-stone-900 p-4 hover:border-amber-500/50 hover:bg-stone-800/60 transition-all"
+      className="group flex items-center gap-4 rounded-xl bg-surface ring-1 ring-blue-500/10 border-l-2 border-l-blue-500/40 px-4 py-4 shadow-blue-glow hover:shadow-blue-glow-hover hover:ring-blue-500/25 hover:border-l-blue-500 transition-all duration-300"
     >
       <div className="flex-1 min-w-0 space-y-1.5">
-        <p className="text-sm font-semibold leading-snug truncate group-hover:text-white transition-colors">
+        <p className="text-sm font-semibold leading-snug truncate group-hover:text-white transition-colors duration-300">
           {issue.title}
         </p>
-        <div className="flex items-center gap-1 text-sm text-stone-400">
+        <div className="flex items-center gap-1 text-xs text-slate-500">
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
           </svg>
-          {issue.edit_count}회 편집
+          {issue.edit_count.toLocaleString()}회 편집
         </div>
       </div>
-      <span className="shrink-0 text-sm text-stone-400">
-        {new Date(issue.updated_at).toLocaleDateString("ko-KR", { month: "long", day: "numeric" })}
-      </span>
-      <svg
-        className="w-4 h-4 text-stone-700 group-hover:text-stone-400 transition-colors shrink-0"
-        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-      </svg>
+      <Sparkline issueId={issue.issue_id} editCount={issue.edit_count} />
+      <div className="text-right shrink-0 space-y-0.5">
+        <p className="text-xs text-slate-500">
+          {new Date(issue.updated_at).toLocaleDateString("ko-KR", { month: "long", day: "numeric" })}
+        </p>
+        <svg
+          className="w-4 h-4 text-slate-700 group-hover:text-slate-400 transition-colors duration-300 ml-auto"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+        </svg>
+      </div>
     </Link>
   );
 }
@@ -159,17 +185,17 @@ export default function HistoryPage() {
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold font-display">Archive</h1>
           {!loading && (
-            <span className="text-sm font-medium text-stone-400 bg-stone-800 px-2.5 py-1 rounded-full">
+            <span className="text-sm font-medium text-slate-400 bg-slate-800 px-2.5 py-1 rounded-full">
               {filtered.length}건
             </span>
           )}
         </div>
-        <p className="text-sm text-stone-400">소강 상태로 마무리된 이슈를 모아둔 곳입니다.</p>
+        <p className="text-sm text-slate-400">소강 상태로 마무리된 이슈를 모아둔 곳입니다.</p>
       </div>
 
       <div className="relative">
         <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500 pointer-events-none"
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none"
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607z" />
@@ -179,7 +205,7 @@ export default function HistoryPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="이슈 검색..."
-          className="w-full rounded-lg bg-stone-800 pl-9 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-amber-500 placeholder:text-stone-500"
+          className="w-full rounded-lg border border-slate-800 bg-surface pl-9 pr-4 py-2.5 text-sm outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 placeholder:text-slate-600 transition-colors"
         />
       </div>
 
@@ -191,8 +217,8 @@ export default function HistoryPage() {
               onClick={() => setPeriod(p)}
               className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
                 period === p
-                  ? "border-amber-500 bg-amber-500/10 text-amber-500 font-medium"
-                  : "border-stone-700 text-stone-500 hover:text-stone-300 hover:border-stone-600"
+                  ? "border-blue-500 bg-blue-500/10 text-blue-400 font-medium"
+                  : "border-slate-700 text-slate-500 hover:text-slate-300 hover:border-slate-600"
               }`}
             >
               {PERIOD_LABELS[p]}
@@ -206,8 +232,8 @@ export default function HistoryPage() {
               onClick={() => setSort(s)}
               className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
                 sort === s
-                  ? "border-amber-500 bg-amber-500/10 text-amber-500 font-medium"
-                  : "border-stone-700 text-stone-500 hover:text-stone-300 hover:border-stone-600"
+                  ? "border-blue-500 bg-blue-500/10 text-blue-400 font-medium"
+                  : "border-slate-700 text-slate-500 hover:text-slate-300 hover:border-slate-600"
               }`}
             >
               {SORT_LABELS[s]}
@@ -219,7 +245,7 @@ export default function HistoryPage() {
       {loading && <HistorySkeletons />}
 
       {!loading && filtered.length === 0 && (
-        <div className="flex flex-col items-center justify-center gap-3 py-16 text-stone-500">
+        <div className="flex flex-col items-center justify-center gap-3 py-16 text-slate-500">
           <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
           </svg>
@@ -240,8 +266,8 @@ export default function HistoryPage() {
               <div key={group.key} className="space-y-2">
                 {sort === "latest" && (
                   <div className="flex items-center gap-2 pb-1">
-                    <span className="text-sm font-semibold text-stone-300">{group.label}</span>
-                    <span className="text-xs text-stone-500 bg-stone-800 px-2 py-0.5 rounded-full">
+                    <span className="text-sm font-semibold text-slate-300">{group.label}</span>
+                    <span className="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full">
                       {group.items.length}건
                     </span>
                   </div>
@@ -258,9 +284,9 @@ export default function HistoryPage() {
                 {!isExpanded && remaining > 0 && (
                   <button
                     onClick={() => setExpanded((prev) => new Set([...prev, group.key]))}
-                    className="w-full rounded-lg border border-stone-800 py-2.5 text-sm text-stone-400 hover:border-stone-700 hover:text-white transition-colors"
+                    className="w-full py-2.5 text-sm text-blue-400 border border-blue-500/30 rounded-lg hover:bg-blue-500/10 hover:border-blue-500/60 hover:shadow-[0_0_14px_rgba(59,130,246,0.2)] transition-all"
                   >
-                    {remaining}건 더 보기
+                    {remaining}건 더 보기 ↓
                   </button>
                 )}
               </div>

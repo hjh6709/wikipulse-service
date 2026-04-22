@@ -21,31 +21,31 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
-      <div className="w-full max-w-sm rounded-2xl border border-stone-800 bg-stone-900 p-8 shadow-xl">
+      <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-surface p-8 shadow-blue-glow">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold">WikiPulse</h1>
-          <p className="mt-1 text-sm text-stone-400">계정으로 로그인하세요</p>
+          <p className="mt-1 text-sm text-slate-400">계정으로 로그인하세요</p>
         </div>
 
         <form onSubmit={handleMockLogin} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-sm text-stone-300">Username</label>
+            <label className="text-sm text-slate-300">Username</label>
             <input
               type="text"
               placeholder="아무 값이나 입력하세요"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full rounded-lg bg-stone-800 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full rounded-lg bg-slate-800 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-sm text-stone-300">Password</label>
+            <label className="text-sm text-slate-300">Password</label>
             <input
               type="password"
               placeholder="아무 값이나 입력하세요"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg bg-stone-800 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full rounded-lg bg-slate-800 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600"
             />
           </div>
           {error && (
@@ -56,7 +56,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading || !username}
-            className="w-full rounded-lg bg-amber-600 py-3 font-semibold hover:bg-amber-500 transition-colors disabled:opacity-50"
+            className="w-full rounded-lg bg-gradient-to-r from-blue-700 to-blue-500 py-3 text-white font-semibold shadow-blue-btn hover:shadow-blue-btn-hover hover:from-blue-600 hover:to-blue-400 transition-all disabled:opacity-50"
           >
             {loading ? "로그인 중..." : "로그인"}
           </button>
@@ -65,7 +65,7 @@ export default function LoginPage() {
         {process.env.NEXT_PUBLIC_KEYCLOAK_ENABLED === "true" && (
           <button
             onClick={() => signIn("keycloak", { callbackUrl: "/issues" })}
-            className="mt-3 w-full rounded-lg border border-stone-700 py-3 text-sm hover:bg-stone-800 transition-colors"
+            className="mt-3 w-full rounded-lg border border-slate-700 py-3 text-sm hover:bg-slate-800 transition-colors"
           >
             Keycloak으로 로그인
           </button>
