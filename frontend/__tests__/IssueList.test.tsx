@@ -79,7 +79,7 @@ describe("IssueList", () => {
     fetchIssues.mockResolvedValue([]);
     render(<IssueList />);
     await waitFor(() => {
-      expect(screen.getByText("검색 결과가 없습니다.")).toBeInTheDocument();
+      expect(screen.getByText("이슈가 없습니다.")).toBeInTheDocument();
     });
   });
 

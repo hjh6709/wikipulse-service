@@ -73,7 +73,7 @@ export default function IssuePage({ params }: { params: { id: string } }) {
     if (lastMessage.type === "comment") {
       const comment = lastMessage.data as unknown as CommentData;
       setCommentData(comment);
-      setSentimentData({ sentiment: comment.sentiment, sentiment_score: 1 });
+      setSentimentData({ sentiment: comment.sentiment, sentiment_score: (lastMessage.data as { sentiment_score?: number }).sentiment_score ?? 1 });
     }
   }, [lastMessage]);
 

@@ -364,6 +364,34 @@ async def issue_stream(websocket: WebSocket, token: str = Query(...)):
 - Kafka 소비자: `await _queue.put(msg)` — 큐에 넣기
 - WebSocket 핸들러: `await queue.get()` — 큐에서 꺼내기
 
+### reddit-comments + sentiment-results 매칭
+
+두 토픽이 별개로 발행됩니다.
+
+```
+김찬영님 → reddit-comments  토픽: { comment_id, author, body, score, created_at }
+양성호님 → sentiment-results 토픽: { comment_id, sentiment, sentiment_score }
+```
+
+같은 `comment_id`를 가진 두 메시지를 백엔드에서 합쳐서 프론트로 보냅니다.
+
+```python
+# kafka_consumer.py
+_comments: dict[str, dict] = {}  # comment_id → 댓글 원본 저장
+
+if msg.topic == "reddit-comments":
+    _comments[value["comment_id"]] = value
+    await _queue.put({"topic": "comment", "data": value})
+
+elif msg.topic == "sentiment-results":
+    comment_id = value.get("comment_id")
+    if comment_id in _comments:
+        merged = {**_comments[comment_id], **value}  # 합치기
+        await _queue.put({"topic": "comment", "data": merged})
+```
+
+프론트는 `comment` 타입 하나만 받으면 됩니다. 두 토픽을 신경 쓸 필요 없습니다.
+
 ### Mock 스트림
 
 로컬에서 Kafka 없이 테스트할 때는 `mock/` 폴더의 JSON 파일을 3초마다 보냅니다.
@@ -807,22 +835,136 @@ return data[:limit]
 브라우저와 FastAPI 사이에 위치하는 API 게이트웨이입니다.
 
 ```
-브라우저 → Kong (8000) → FastAPI (8080)
+브라우저 → Kong → FastAPI
 ```
 
-Kong이 하는 일: JWT 검증, 라우팅, 인증 통합, Rate Limiting.
-FastAPI에서 직접 JWT를 검증하는 코드 (`core/auth.py`)는 Kong 연동 후 제거 예정입니다.
+Kong이 하는 일: JWT 검증, 라우팅, Rate Limiting.
+
+Kong이 없으면 FastAPI가 이 역할을 직접 해야 합니다. 지금 `core/auth.py`의 `verify_jwt`가 그 역할입니다. Kong 연동 후에는 이 코드가 제거됩니다.
+
+**WebSocket도 Kong을 통합니다.**
+
+WebSocket 연결은 브라우저가 HTTP 요청으로 시작합니다. 이 요청 안에 "WebSocket으로 전환하고 싶다"는 헤더가 포함됩니다.
+
+```
+브라우저 → HTTP 요청
+           Upgrade: websocket
+           Connection: Upgrade
+```
+
+Kong은 이걸 받아서 FastAPI로 그대로 넘겨줍니다. FastAPI가 101(Switching Protocols)로 응답하면 그때부터 브라우저와 FastAPI 사이에 WebSocket 프로토콜로 통신이 시작됩니다.
+
+```
+1. 브라우저 → Kong → FastAPI  (HTTP Upgrade 요청)
+2. FastAPI → Kong → 브라우저  (101 응답)
+3. 브라우저 ←——— Kong ———→ FastAPI  (이후 WebSocket 데이터 중계)
+```
+
+연결 수립 이후 Kong은 **프록시** 역할입니다. 브라우저와 FastAPI 사이에서 WebSocket 데이터를 중계합니다. 브라우저 입장에서는 Kong이 있는지 모르고 FastAPI와 직접 통신하는 것처럼 느껴집니다.
+
+**Kong이 사용자 정보를 헤더로 전달합니다.**
+
+JWT 검증을 Kong이 하면, FastAPI는 토큰을 직접 decode하지 않고 Kong이 넘겨준 헤더에서 사용자 정보를 읽습니다.
+
+```python
+# Kong 연동 후
+def get_current_user(request: Request):
+    user_id = request.headers.get("X-User-ID")
+    return {"sub": user_id}
+```
 
 ### Keycloak SSO
 
-팀에서 운영하는 인증 서버입니다. "Keycloak으로 로그인" 버튼을 누르면:
+팀에서 운영하는 인증 서버입니다. Keycloak이 하는 일: 로그인, 회원가입, JWT 발급. 회원가입 UI를 별도로 만들지 않아도 됩니다 — Keycloak 로그인 페이지에 회원가입 링크가 포함됩니다.
 
 ```
-브라우저 → Keycloak 로그인 화면 → 인증 성공 → 코드 발급 →
-Next.js가 코드를 JWT로 교환 → 세션 저장
+브라우저 → Keycloak 로그인 화면 → 인증 성공 → JWT 발급 →
+Next.js가 JWT를 세션에 저장 → API 요청 시 Authorization: Bearer <JWT>
 ```
 
-현재는 `CredentialsProvider` (mock 로그인)를 쓰고, 운영 시 `KeycloakProvider`로 교체합니다.
+현재는 `CredentialsProvider` (mock 로그인)를 쓰고, 운영 시 `KeycloakProvider`로 교체합니다. 환경변수 3개 추가만으로 전환됩니다.
+
+```env
+KEYCLOAK_ID=wikipulse-frontend
+KEYCLOAK_SECRET=<윤승호님>
+KEYCLOAK_ISSUER=http://keycloak:8080/realms/wikipulse
+NEXT_PUBLIC_KEYCLOAK_ENABLED=true
+```
+
+**대칭키 vs 비대칭키**
+
+| | 지금 (mock) | Keycloak 연동 후 |
+|---|---|---|
+| 알고리즘 | HS256 (대칭키) | RS256 (비대칭키) |
+| 서명 | 공유 비밀키로 서명 | Keycloak 개인키로 서명 |
+| 검증 | 같은 비밀키로 검증 | Keycloak 공개키로 검증 |
+| 검증 주체 | FastAPI | Kong |
+
+비대칭키 방식에서는 Keycloak이 개인키로 서명한 JWT를 Kong이 공개키로 검증합니다. 매 요청마다 Keycloak 서버에 물어보는 게 아니라, 공개키를 미리 가져다 로컬에서 직접 검증합니다. 빠르고 Keycloak 장애와 무관하게 동작합니다.
+
+**인증 전체 흐름 (Kong 연동 후)**
+
+```
+FE → Keycloak 로그인 → RS256 JWT 발급
+FE → API 요청 시 JWT 첨부
+Kong → Keycloak 공개키로 JWT 검증 → 사용자 정보 헤더로 추가
+FastAPI → Kong 헤더에서 사용자 정보 읽기 (verify_jwt 불필요)
+```
+
+### 온프레미스 K8s 인프라
+
+WikiPulse는 온프레미스 서버에서 K8s 클러스터로 운영됩니다.
+
+```
+cp01 (10.10.0.11)
+cp02 (10.10.0.12)  ← kubeadm HA 3노드 클러스터
+cp03 (10.10.0.13)
+        ↑
+   VIP 10.10.0.10 (kube-vip, kubectl이 붙는 엔드포인트)
+```
+
+**주요 컴포넌트:**
+
+| 컴포넌트 | 역할 |
+|---|---|
+| kubeadm | K8s 클러스터 구성 |
+| Cilium | CNI (네트워크, kube-proxy 대체) |
+| MetalLB | 온프레미스 LoadBalancer IP 할당 |
+| Longhorn | 스토리지 |
+| kube-vip | 컨트롤플레인 VIP |
+| ArgoCD | GitOps 배포 자동화 |
+| Tailscale | 메시 VPN |
+
+**MetalLB가 필요한 이유:**
+
+클라우드(AWS, GCP)는 LoadBalancer 서비스를 만들면 자동으로 외부 IP를 줍니다. 온프레미스는 그 역할을 하는 것이 없어서 MetalLB가 대신 IP를 할당합니다.
+
+```
+Kong Service (LoadBalancer 타입)
+    → MetalLB가 10.10.0.200 할당
+    → 브라우저가 10.10.0.200으로 요청 → Kong → FastAPI
+```
+
+**Tailscale이 하는 역할:**
+
+온프레미스 클러스터 내부 IP(`10.10.0.x`)는 사내 LAN 안에서만 접근 가능합니다. Tailscale이 WireGuard 기반 메시 VPN을 만들어서 집이나 카페에서도 `10.10.0.x`에 접근할 수 있게 합니다.
+
+```
+[내 노트북]
+    ↓ Tailscale (WireGuard VPN)
+[request700k-host] ← subnet router, 10.10.0.0/24 대역 광고
+    ↓
+[cp01/cp02/cp03 K8s 클러스터]
+```
+
+외부 사용자 접근 흐름:
+```
+브라우저 → CloudFront → Tailscale Funnel → Kong → FastAPI
+```
+
+**ArgoCD — GitOps 배포:**
+
+ArgoCD가 GitHub 레포를 바라보며 변경사항을 자동으로 K8s에 배포합니다. `gitops/argocd/apps/` 폴더에 앱 정의를 추가하면 자동 배포됩니다.
 
 ### AWS Lambda + EventBridge
 
@@ -871,6 +1013,29 @@ INFO:     GET /issues - 200
 | pytest | FastAPI 엔드포인트, WebSocket | 4주차 22개 완료, 실데이터 연동 후 추가 |
 | Jest | React 컴포넌트, useWebSocket 훅 | 8주차 예정 |
 | k6 | API 부하 테스트 (동시 100명) | 8주차 예정 |
+
+---
+
+## REST vs WebSocket — 데이터 로딩 전략
+
+페이지 진입 시와 이후 실시간 업데이트를 구분합니다.
+
+```
+페이지 진입 → REST API로 초기 데이터 한 번에 로드
+이후        → WebSocket으로 새 데이터 실시간 수신
+```
+
+| 데이터 | 초기 로드 | 실시간 업데이트 |
+|---|---|---|
+| 이슈 목록 | GET /issues | WebSocket spike 이벤트 시 캐시 무효화 |
+| 브리핑 | GET /issues/{id}/briefing | WebSocket briefing 타입 |
+| 감성 | GET /issues/{id}/sentiment | WebSocket comment 타입 |
+| 타임라인 | GET /issues/{id}/timeline | - |
+| 댓글 | GET /issues/{id}/comments (미구현, 스키마 확정 후) | WebSocket comment 타입 |
+
+WebSocket은 **전체 broadcast** 구조입니다. 연결된 모든 클라이언트가 모든 메시지를 받고, 프론트에서 `issue_id`로 현재 보고 있는 이슈 것만 필터링합니다.
+
+WebSocket은 페이지에 있는 동안만 연결을 유지합니다. 페이지를 나가면 끊기고, 다시 들어오면 새로 연결됩니다.
 
 ---
 

@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 _queue: asyncio.Queue[dict] = asyncio.Queue()
 _kafka_healthy: bool = True  # WebSocket/API에서 읽어 프론트엔드에 전달
+_comments: dict[str, dict] = {}  # comment_id → reddit-comments 원본 (sentiment 매칭용)
 
 
 async def get_message_queue() -> asyncio.Queue[dict]:
@@ -44,7 +45,25 @@ async def _consume(topics: list[str]) -> None:
 
     try:
         async for msg in consumer:
-            await _queue.put({"topic": msg.topic, "data": msg.value})
+            value: dict = msg.value if isinstance(msg.value, dict) else {}
+
+            if msg.topic == "reddit-comments":
+                comment_id = value.get("comment_id")
+                if comment_id:
+                    _comments[comment_id] = value
+                await _queue.put({"topic": "comment", "data": value})
+
+            elif msg.topic == "sentiment-results":
+                comment_id = value.get("comment_id")
+                if comment_id and comment_id in _comments:
+                    merged = {**_comments[comment_id], **value}
+                    await _queue.put({"topic": "comment", "data": merged})
+                else:
+                    await _queue.put({"topic": "sentiment", "data": value})
+
+            else:
+                await _queue.put({"topic": msg.topic, "data": value})
+
             if msg.topic == "alerts":
                 from app.services.redis_client import invalidate_issues_cache
                 await invalidate_issues_cache()
